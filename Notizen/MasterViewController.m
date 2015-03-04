@@ -7,7 +7,6 @@
 //
 
 #import "MasterViewController.h"
-#import "DetailViewController.h"
 #import "ContainerViewController.h"
 #import "NoteContainer.h"
 #import "Note.h"

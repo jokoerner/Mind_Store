@@ -13,6 +13,7 @@
 #define observe(who, sel, nam) [[NSNotificationCenter defaultCenter] addObserver:who selector:sel name:nam object:nil]
 
 #define iPad ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+#define iPhone ([[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
 
 #define backgroundColor [UIColor colorWithPatternImage:[UIImage imageNamed:@"Background"]]
 
