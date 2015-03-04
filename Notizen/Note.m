@@ -15,22 +15,33 @@
 
 - (void)awakeFromInsert {
     [self updateHash];
+    NSDate *date = [NSDate date];
+    self.creation = date;
+    self.timeStamp = date;
 }
 
 - (void)willSave {
-    [self updateHash];
+    [super willSave];
+    NSString *newHash = [self calcHash];
+    if (![newHash isEqualToString:self.myHash]) {
+        self.myHash = newHash;
+    }
+    NSDate *currentDate = [NSDate date];
+    if ([currentDate timeIntervalSinceDate:self.timeStamp] > 1.0) {
+        self.timeStamp = currentDate;
+    }
 }
 
 - (void)updateHash {
-    self.myHash = [self hash];
+    self.myHash = [self calcHash];
 }
 
-- (NSString *)hash {
+- (NSString *)calcHash {
     NSArray *array = [[self.noteContents allObjects] sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"index" ascending:YES]]];
     
     NSString *add = @"";
     for (NoteContent *content in array) {
-        add = [NSString stringWithFormat:@"%@%@", add, [content hash]];
+        add = [NSString stringWithFormat:@"%@%@", add, [content calcHash]];
     }
     
     return [NSString stringWithFormat:@"%@%ld%@", self.noteContainer.title, (long)array.count, add];

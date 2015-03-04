@@ -10,11 +10,15 @@
 #import <CoreData/CoreData.h>
 #import "StoreHandler.h"
 
-@class DetailViewController;
+@class ContainerViewController;
 
-@interface MasterViewController : UITableViewController <NSFetchedResultsControllerDelegate>
+@interface MasterViewController : UITableViewController <NSFetchedResultsControllerDelegate> {
+    UIImageView *topImageview;
+    UIImageView *midImageview;
+    UIImageView *botImageview;
+}
 
-@property (strong, nonatomic) DetailViewController *detailViewController;
+@property (strong, nonatomic) ContainerViewController *detailViewController;
 
 @property (strong, nonatomic) NSFetchedResultsController *fetchedResultsController;
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;

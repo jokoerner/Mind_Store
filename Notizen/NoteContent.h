@@ -13,7 +13,7 @@
 
 @interface NoteContent : NSManagedObject
 
-- (NSString *)hash;
+- (NSString *)calcHash;
 
 @property (nonatomic, retain) NSData * data;
 @property (nonatomic, retain) NSString * dataType;

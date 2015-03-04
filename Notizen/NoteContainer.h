@@ -12,11 +12,12 @@
 
 @interface NoteContainer : NSManagedObject
 
-- (NSString *)hash;
+- (NSString *)calcHash;
 
 @property (nonatomic, retain) NSDate * timeStamp;
 @property (nonatomic, retain) NSString * title;
 @property (nonatomic, retain) NSString * myHash;
+@property (nonatomic, retain) NSString * firstLetter;
 @property (nonatomic, retain) NSSet *notes;
 @end
 

@@ -11,7 +11,13 @@
 
 #define post(name) [[NSNotificationCenter defaultCenter] postNotificationName:name object:nil]
 #define observe(who, sel, nam) [[NSNotificationCenter defaultCenter] addObserver:who selector:sel name:nam object:nil]
+
 #define iPad ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+
+#define backgroundColor [UIColor colorWithPatternImage:[UIImage imageNamed:@"Background"]]
+
+#define getDefault(key) [[NSUserDefaults standardUserDefaults] valueForKey:key]
+#define setDefault(value, key) [[NSUserDefaults standardUserDefaults] setValue:value forKey:key]
 
 @interface StoreHandler : NSObject
 

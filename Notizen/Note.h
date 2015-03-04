@@ -13,7 +13,7 @@
 
 @interface Note : NSManagedObject
 
-- (NSString *)hash;
+- (NSString *)calcHash;
 
 @property (nonatomic, retain) NSDate * creation;
 @property (nonatomic, retain) NSDate * timeStamp;

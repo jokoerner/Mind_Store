@@ -7,10 +7,12 @@
 //
 
 #import "AppDelegate.h"
-#import "DetailViewController.h"
+#import "ContainerViewController.h"
 #import "MasterViewController.h"
 #import "StoreHandler.h"
+#import "NoteContainer.h"
 #import "Note.h"
+#import "NoteContent.h"
 
 @interface AppDelegate () <UISplitViewControllerDelegate>
 
@@ -24,6 +26,8 @@
     
     //StoreHandler initialisieren
     [StoreHandler shared];
+    
+    [self initializeUserDefaults];
     
     [[NSNotificationCenter defaultCenter]
      addObserverForName:NSPersistentStoreCoordinatorStoresWillChangeNotification
@@ -74,7 +78,38 @@
     UINavigationController *masterNavigationController = splitViewController.viewControllers[0];
     MasterViewController *controller = (MasterViewController *)masterNavigationController.topViewController;
     controller.managedObjectContext = self.managedObjectContext;
+    
+    [self createSampleData];
+    
     return YES;
+}
+
+- (void)initializeUserDefaults  {
+    if (getDefault(@"ascending") == nil) {
+        setDefault(@YES, @"ascending");
+    }
+}
+
+
+- (void)createSampleData {
+    NSManagedObjectContext *context = self.managedObjectContext;
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"NoteContainer" inManagedObjectContext:context];
+    NoteContainer *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+    [newManagedObject setTitle:@"Notizen"];
+    
+    entity = [NSEntityDescription entityForName:@"Note" inManagedObjectContext:context];
+    Note *newNote = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+    [newNote setNoteContainer:newManagedObject];
+    
+    entity = [NSEntityDescription entityForName:@"NoteContent" inManagedObjectContext:context];
+    NoteContent *newContent = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+    
+    [newContent setIndex:@0];
+    [newContent setDataType:@"text"];
+    [newContent setData:[@"-NoteContent-" dataUsingEncoding:NSUTF8StringEncoding]];
+    [newContent setNote:newNote];
+    
+    [context save:nil];
 }
 
 - (void)deduplicate {
@@ -161,7 +196,7 @@
 #pragma mark - Split view
 
 - (BOOL)splitViewController:(UISplitViewController *)splitViewController collapseSecondaryViewController:(UIViewController *)secondaryViewController ontoPrimaryViewController:(UIViewController *)primaryViewController {
-    if ([secondaryViewController isKindOfClass:[UINavigationController class]] && [[(UINavigationController *)secondaryViewController topViewController] isKindOfClass:[DetailViewController class]] && ([(DetailViewController *)[(UINavigationController *)secondaryViewController topViewController] detailItem] == nil)) {
+    if ([secondaryViewController isKindOfClass:[UINavigationController class]] && [[(UINavigationController *)secondaryViewController topViewController] isKindOfClass:[ContainerViewController class]] && ([(ContainerViewController *)[(UINavigationController *)secondaryViewController topViewController] container] == nil)) {
         // Return YES to indicate that we have handled the collapse by doing nothing; the secondary controller will be discarded.
         return YES;
     } else {

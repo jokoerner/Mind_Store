@@ -8,6 +8,10 @@
 
 #import "MasterViewController.h"
 #import "DetailViewController.h"
+#import "ContainerViewController.h"
+#import "NoteContainer.h"
+#import "Note.h"
+#import "NoteContent.h"
 
 @interface MasterViewController ()
 
@@ -30,7 +34,13 @@
 
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
     self.navigationItem.rightBarButtonItem = addButton;
-    self.detailViewController = (DetailViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
+    self.detailViewController = (ContainerViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
+    
+//    [self.tableView setBackgroundColor:backgroundColor];
+//    [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+//    topImageview = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TopCell"]];
+//    midImageview = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"MidCell"]];
+//    botImageview = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"BotCell"]];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -38,6 +48,8 @@
     observe(self, @selector(dropReferencesToManagedObjects), @"dropReferencesToManagedObjects");
     observe(self, @selector(enableUserInteraction), @"enableUserInteraction");
     observe(self, @selector(disableUserInteraction), @"disableUserInteraction");
+    
+    [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -90,8 +102,9 @@
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
         NSManagedObject *object = [[self fetchedResultsController] objectAtIndexPath:indexPath];
-        DetailViewController *controller = (DetailViewController *)[[segue destinationViewController] topViewController];
-        [controller setDetailItem:object];
+        ContainerViewController *controller = (ContainerViewController *)[[segue destinationViewController] topViewController];
+        [controller setContainer:(NoteContainer *)object];
+        [controller setManagedObjectContext:self.managedObjectContext];
         controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
         controller.navigationItem.leftItemsSupplementBackButton = YES;
     }
@@ -136,8 +149,58 @@
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
     NSManagedObject *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    cell.textLabel.text = [[object valueForKey:@"timeStamp"] description];
+    cell.textLabel.text = [object valueForKey:@"title"];
 }
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    return 50.0f;
+}
+
+- (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView {
+    NSMutableArray *array = [NSMutableArray array];
+    NSInteger numberOfSections = [self numberOfSectionsInTableView:tableView];
+    NSInteger totalNumberOfRows = 0;
+    
+    for (int i = 0; i < numberOfSections; i++) {
+        id <NSFetchedResultsSectionInfo> sectionInfo = [self.fetchedResultsController sections][i];
+        [array addObject:[sectionInfo name]];
+    }
+    
+    for (int i = 0; i < numberOfSections; i++) {
+        totalNumberOfRows = totalNumberOfRows + [self tableView:tableView numberOfRowsInSection:i];
+    }
+    
+    CGFloat viewHeight = self.view.frame.size.height;
+    CGFloat tableHeight = totalNumberOfRows * 50.0;
+    
+    if (viewHeight < tableHeight && array.count > 1) {
+        return array;
+    }
+    
+    return [NSArray array];;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView sectionForSectionIndexTitle:(NSString *)title atIndex:(NSInteger)index {
+    return index;
+}
+
+//- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
+//    if (indexPath.row == 0) {
+//        cell.backgroundView = topImageview;
+//    }
+//    else if (indexPath.row == [self tableView:tableView numberOfRowsInSection:indexPath.section]-1) {
+//        cell.backgroundView = botImageview;
+//    }
+//    else {
+//        cell.backgroundView = midImageview;
+//    }
+//    
+//    [cell setBackgroundColor:[UIColor clearColor]];
+//    [cell.textLabel setBackgroundColor:[UIColor clearColor]];
+//    [cell.textLabel setTextColor:[UIColor whiteColor]];
+//    [cell.textLabel setFont:[UIFont systemFontOfSize:22.0]];
+//    cell.indentationWidth = 10.0;
+//}
 
 #pragma mark - Fetched results controller
 
@@ -149,21 +212,21 @@
     
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     // Edit the entity name as appropriate.
-    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Note" inManagedObjectContext:self.managedObjectContext];
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"NoteContainer" inManagedObjectContext:self.managedObjectContext];
     [fetchRequest setEntity:entity];
     
     // Set the batch size to a suitable number.
     [fetchRequest setFetchBatchSize:20];
     
     // Edit the sort key as appropriate.
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"timeStamp" ascending:NO];
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"title" ascending:getDefault(@"ascending")];
     NSArray *sortDescriptors = @[sortDescriptor];
     
     [fetchRequest setSortDescriptors:sortDescriptors];
     
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
-    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:self.managedObjectContext sectionNameKeyPath:nil cacheName:@"Master"];
+    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:self.managedObjectContext sectionNameKeyPath:@"firstLetter" cacheName:@"Master"];
     aFetchedResultsController.delegate = self;
     self.fetchedResultsController = aFetchedResultsController;
     

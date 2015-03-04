@@ -8,6 +8,7 @@
         <relationship name="noteContents" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="NoteContent" inverseName="note" inverseEntity="NoteContent" syncable="YES"/>
     </entity>
     <entity name="NoteContainer" representedClassName="NoteContainer" syncable="YES">
+        <attribute name="firstLetter" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="myHash" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="timeStamp" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
@@ -22,8 +23,8 @@
         <relationship name="note" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="noteContents" inverseEntity="Note" syncable="YES"/>
     </entity>
     <elements>
-        <element name="NoteContainer" positionX="-380" positionY="-117" width="128" height="103"/>
         <element name="Note" positionX="-54" positionY="0" width="128" height="118"/>
+        <element name="NoteContainer" positionX="-380" positionY="-117" width="128" height="118"/>
         <element name="NoteContent" positionX="207" positionY="162" width="128" height="133"/>
     </elements>
 </model>

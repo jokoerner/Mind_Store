@@ -15,17 +15,27 @@
 
 - (void)awakeFromInsert {
     [self updateHash];
+    self.index = @-1;
+    self.timeStamp = [NSDate date];
 }
 
 - (void)willSave {
-    [self updateHash];
+    [super willSave];
+    NSString *newHash = [self calcHash];
+    if (![newHash isEqualToString:self.myHash]) {
+        self.myHash = newHash;
+    }
+    NSDate *currentDate = [NSDate date];
+    if ([currentDate timeIntervalSinceDate:self.timeStamp] > 1.0) {
+        self.timeStamp = currentDate;
+    }
 }
 
 - (void)updateHash {
-    self.myHash = [self hash];
+    self.myHash = [self calcHash];
 }
 
-- (NSString *)hash {
+- (NSString *)calcHash {
     return [NSString stringWithFormat:@"%@%lu", self.dataType, (unsigned long)self.data.length];
 }
 
