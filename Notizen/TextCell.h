@@ -10,4 +10,6 @@
 
 @interface TextCell : UITableViewCell
 
+@property (strong) IBOutlet UITextView *noteTextView;
+
 @end

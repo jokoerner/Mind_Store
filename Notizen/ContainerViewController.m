@@ -9,6 +9,8 @@
 #import "ContainerViewController.h"
 #import "NoteContent.h"
 #import "NoteContainer.h"
+#import "TextCell.h"
+#import "ImageCell.h"
 
 @interface ContainerViewController ()
 
@@ -57,9 +59,61 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ContainerCell" forIndexPath:indexPath];
-    [self configureCell:cell atIndexPath:indexPath];
-    return cell;
+    NoteContent *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
+    NSString *dataType = object.dataType;
+    if ([dataType isEqualToString:@"text"]) {
+        TextCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TextCell" forIndexPath:indexPath];
+        NSString *text = [[NSString alloc] initWithData:object.data encoding:NSUTF8StringEncoding];
+        cell.noteTextView.text = text;
+        [cell.noteTextView setFrame:CGRectMake(5, 0, self.view.frame.size.width-10, [self tableView:tableView heightForRowAtIndexPath:indexPath])];
+        return cell;
+    }
+    else if ([dataType isEqualToString:@"image"]) {
+        ImageCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TextCell" forIndexPath:indexPath];
+        UIImage *image = [UIImage imageWithData:object.data];
+        cell.noteImageView.image = image;
+        cell.contentMode = UIViewContentModeScaleAspectFit;
+        return cell;
+    }
+    else if ([dataType isEqualToString:@"video"]) {
+        //TODO
+    }
+    else if ([dataType isEqualToString:@"audio"]) {
+        //TODO
+    }
+    else if ([dataType isEqualToString:@"location"]) {
+        //TODO
+    }
+    return nil;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NoteContent *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
+    NSString *dataType = object.dataType;
+    if ([dataType isEqualToString:@"text"]) {
+        NSString* text = [[NSString alloc] initWithData:object.data encoding:NSUTF8StringEncoding];
+        NSDictionary *attributes = @{NSFontAttributeName: [UIFont systemFontOfSize:18]};
+        CGRect rect = [text boundingRectWithSize:CGSizeMake(self.view.frame.size.width-10, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin attributes:attributes context:nil];
+        CGFloat height = rect.size.height+4;
+        return MAX(height+10, 44.0);
+    }
+    else if ([dataType isEqualToString:@"image"]) {
+        UIImage *image = [UIImage imageWithData:object.data];
+        if (image.size.height < 300) {
+            return image.size.height;
+        }
+        return 300.0;
+    }
+    else if ([dataType isEqualToString:@"video"]) {
+        //TODO
+    }
+    else if ([dataType isEqualToString:@"audio"]) {
+        //TODO
+    }
+    else if ([dataType isEqualToString:@"location"]) {
+        //TODO
+    }
+    return 44.0;
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -80,30 +134,6 @@
             abort();
         }
     }
-}
-
-- (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
-    NoteContent *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
-    
-    NSString *text = @"";
-    NSString *dataType = object.dataType;
-    if ([dataType isEqualToString:@"text"]) {
-        text = [[NSString alloc] initWithData:object.data encoding:NSUTF8StringEncoding];
-    }
-    else if ([dataType isEqualToString:@"image"]) {
-        //TODO
-    }
-    else if ([dataType isEqualToString:@"video"]) {
-        //TODO
-    }
-    else if ([dataType isEqualToString:@"audio"]) {
-        //TODO
-    }
-    else if ([dataType isEqualToString:@"location"]) {
-        //TODO
-    }
-    
-    cell.textLabel.text = text;
 }
 
 
@@ -187,7 +217,8 @@
             break;
             
         case NSFetchedResultsChangeUpdate:
-            [self configureCell:[tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
+            [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            //[self configureCell:[tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
             break;
             
         case NSFetchedResultsChangeMove:
