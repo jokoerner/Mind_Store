@@ -28,7 +28,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
+    // Do any additional setup after loading the view, typically from a nib
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
 
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
@@ -104,6 +104,7 @@
         ContainerViewController *controller = (ContainerViewController *)[[segue destinationViewController] topViewController];
         [controller setContainer:(NoteContainer *)object];
         [controller setManagedObjectContext:self.managedObjectContext];
+        [controller setTitle:[object valueForKey:@"title"]];
         controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
         controller.navigationItem.leftItemsSupplementBackButton = YES;
     }
@@ -302,5 +303,25 @@
     [self.tableView reloadData];
 }
  */
+
+#pragma mark - Rotation
+
+- (NSUInteger) supportedInterfaceOrientations {
+    // Return a bitmask of supported orientations. If you need more,
+    // use bitwise or (see the commented return).
+    return UIInterfaceOrientationMaskPortrait;
+    // return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
+}
+
+- (UIInterfaceOrientation) preferredInterfaceOrientationForPresentation {
+    // Return the orientation you'd prefer - this is what it launches to. The
+    // user can still rotate. You don't have to implement this method, in which
+    // case it launches in the current orientation
+    return UIInterfaceOrientationPortrait;
+}
+
+- (BOOL)shouldAutorotate {
+    return NO;
+}
 
 @end

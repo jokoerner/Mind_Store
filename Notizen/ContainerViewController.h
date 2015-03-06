@@ -9,9 +9,13 @@
 #import <UIKit/UIKit.h>
 #import <CoreData/CoreData.h>
 
-@class NoteContainer;
+@class NoteContainer, ModalTextView, NoteContent;
 
-@interface ContainerViewController : UITableViewController <NSFetchedResultsControllerDelegate>
+@interface ContainerViewController : UITableViewController <NSFetchedResultsControllerDelegate, UITextViewDelegate> {
+    UITextView *editingTextView;
+    ModalTextView *textView;
+    NoteContent *editingObject;
+}
 
 @property (nonatomic, strong) NoteContainer *container;
 @property (strong, nonatomic) NSFetchedResultsController *fetchedResultsController;

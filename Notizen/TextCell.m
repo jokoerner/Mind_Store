@@ -18,6 +18,8 @@
     self.noteTextView = [[UITextView alloc] initWithFrame:CGRectNull];
     [self.noteTextView setFont:[UIFont systemFontOfSize:18]];
     [self.noteTextView setBackgroundColor:[UIColor clearColor]];
+    [self.noteTextView setTextAlignment:NSTextAlignmentJustified];
+    [self.noteTextView setUserInteractionEnabled:NO];
 }
 
 - (void)layoutSubviews {

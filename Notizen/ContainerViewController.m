@@ -11,6 +11,8 @@
 #import "NoteContainer.h"
 #import "TextCell.h"
 #import "ImageCell.h"
+#import "StoreHandler.h"
+#import "ModalTextView.h"
 
 @interface ContainerViewController ()
 
@@ -66,6 +68,7 @@
         NSString *text = [[NSString alloc] initWithData:object.data encoding:NSUTF8StringEncoding];
         cell.noteTextView.text = text;
         [cell.noteTextView setFrame:CGRectMake(5, 0, self.view.frame.size.width-10, [self tableView:tableView heightForRowAtIndexPath:indexPath])];
+        [cell.noteTextView setDelegate:self];
         return cell;
     }
     else if ([dataType isEqualToString:@"image"]) {
@@ -231,6 +234,59 @@
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
 {
     [self.tableView endUpdates];
+}
+
+#pragma mark - TableView delegate
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    NoteContent *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
+    editingObject = object;
+    if ([object.dataType isEqualToString:@"text"]) {
+        TextCell *cell = (TextCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath];
+        textView = [[ModalTextView alloc] initWithText:cell.noteTextView.text];
+        [textView setOffset:64.0];
+        CGRect frame = [self.view convertRect:cell.noteTextView.frame fromView:cell];
+        [textView showFromFrame:frame onTopOfView:self.navigationController.view];
+        UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissTextView:)];
+        [self.navigationItem setRightBarButtonItem:item animated:YES];
+        [self.navigationItem setHidesBackButton:YES animated:YES];
+        [self.tableView setScrollEnabled:NO];
+    }
+}
+
+#pragma mark - Sonstige
+
+- (void)dismissTextView:(NSNotification *)notification {
+    NoteContent *object = editingObject;
+    [object setData:[textView.textView.text dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.managedObjectContext save:nil];
+    [textView dismiss];
+    textView = nil;
+    [self.navigationItem setHidesBackButton:NO animated:YES];
+    [self.navigationItem setRightBarButtonItems:@[] animated:YES];
+    [self.tableView setScrollEnabled:YES];
+    [self.tableView beginUpdates];
+    [self.tableView endUpdates];
+}
+
+#pragma mark - Rotation
+
+- (NSUInteger) supportedInterfaceOrientations {
+    // Return a bitmask of supported orientations. If you need more,
+    // use bitwise or (see the commented return).
+    return UIInterfaceOrientationMaskPortrait;
+    // return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
+}
+
+- (UIInterfaceOrientation) preferredInterfaceOrientationForPresentation {
+    // Return the orientation you'd prefer - this is what it launches to. The
+    // user can still rotate. You don't have to implement this method, in which
+    // case it launches in the current orientation
+    return UIInterfaceOrientationPortrait;
+}
+
+- (BOOL)shouldAutorotate {
+    return NO;
 }
 
 @end

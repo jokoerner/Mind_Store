@@ -10,7 +10,9 @@
 #import <CoreData/CoreData.h>
 
 #define post(name) [[NSNotificationCenter defaultCenter] postNotificationName:name object:nil]
+#define postWithObject(name, anObject) [[NSNotificationCenter defaultCenter] postNotificationName:name object:anObject]
 #define observe(who, sel, nam) [[NSNotificationCenter defaultCenter] addObserver:who selector:sel name:nam object:nil]
+#define removeObserver(who) [[NSNotificationCenter defaultCenter] removeObserver:who]
 
 #define iPad ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
 #define iPhone ([[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)

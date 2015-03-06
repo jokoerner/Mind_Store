@@ -13,6 +13,7 @@
 #import "NoteContainer.h"
 #import "Note.h"
 #import "NoteContent.h"
+#import "RotationController.h"
 
 @interface AppDelegate () <UISplitViewControllerDelegate>
 
@@ -71,11 +72,11 @@
      }];
     
     UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
-    UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
+    RotationController *navigationController = [splitViewController.viewControllers lastObject];
     navigationController.topViewController.navigationItem.leftBarButtonItem = splitViewController.displayModeButtonItem;
     splitViewController.delegate = self;
 
-    UINavigationController *masterNavigationController = splitViewController.viewControllers[0];
+    RotationController *masterNavigationController = splitViewController.viewControllers[0];
     MasterViewController *controller = (MasterViewController *)masterNavigationController.topViewController;
     controller.managedObjectContext = self.managedObjectContext;
     
@@ -106,7 +107,7 @@
     
     [newContent setIndex:@0];
     [newContent setDataType:@"text"];
-    [newContent setData:[@"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." dataUsingEncoding:NSUTF8StringEncoding]];
+    [newContent setData:[@"Lorem ipsum dolor sit amet" dataUsingEncoding:NSUTF8StringEncoding]];
     [newContent setNote:newNote];
     
     [context save:nil];
@@ -196,12 +197,16 @@
 #pragma mark - Split view
 
 - (BOOL)splitViewController:(UISplitViewController *)splitViewController collapseSecondaryViewController:(UIViewController *)secondaryViewController ontoPrimaryViewController:(UIViewController *)primaryViewController {
-    if ([secondaryViewController isKindOfClass:[UINavigationController class]] && [[(UINavigationController *)secondaryViewController topViewController] isKindOfClass:[ContainerViewController class]] && ([(ContainerViewController *)[(UINavigationController *)secondaryViewController topViewController] container] == nil)) {
+    if ([secondaryViewController isKindOfClass:[RotationController class]] && [[(RotationController *)secondaryViewController topViewController] isKindOfClass:[ContainerViewController class]] && ([(ContainerViewController *)[(RotationController *)secondaryViewController topViewController] container] == nil)) {
         // Return YES to indicate that we have handled the collapse by doing nothing; the secondary controller will be discarded.
         return YES;
     } else {
         return NO;
     }
+}
+
+- (NSUInteger)splitViewControllerSupportedInterfaceOrientations:(UISplitViewController *)splitViewController {
+    return UIInterfaceOrientationMaskPortrait;
 }
 
 #pragma mark - Core Data stack

@@ -10,4 +10,6 @@
 
 @interface ImageCell : UITableViewCell
 
+@property (strong) IBOutlet UIImageView *noteImageView;
+
 @end
