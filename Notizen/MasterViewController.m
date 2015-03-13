@@ -26,6 +26,23 @@
     }
 }
 
+- (void)handleAppearance {
+    setBackgroundForView(self.navigationController.view);
+    [self.view setBackgroundColor:[UIColor clearColor]];
+    [self.tableView setBackgroundColor:[UIColor clearColor]];
+    UIView *clearView = [[UIView alloc] initWithFrame:CGRectNull];
+    [clearView setBackgroundColor:[UIColor clearColor]];
+    [self.tableView setBackgroundView:clearView];
+    
+    self.navigationController.navigationBar.tintColor = customTintColor;
+}
+
+- (void)handleCellAppearance:(UITableViewCell *)cell {
+    cell.textLabel.textColor = [UIColor whiteColor];
+    cell.textLabel.font = customTableFont;
+    cell.backgroundColor = [UIColor clearColor];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib
@@ -35,14 +52,12 @@
     self.navigationItem.rightBarButtonItem = addButton;
     self.detailViewController = (ContainerViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
     
-//    [self.tableView setBackgroundColor:backgroundColor];
-//    [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
-//    topImageview = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"TopCell"]];
-//    midImageview = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"MidCell"]];
-//    botImageview = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"BotCell"]];
+    [self handleAppearance];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
     observe(self, @selector(updateUserInterface), @"updateUserInterface");
     observe(self, @selector(dropReferencesToManagedObjects), @"dropReferencesToManagedObjects");
     observe(self, @selector(enableUserInteraction), @"enableUserInteraction");
@@ -52,6 +67,7 @@
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
@@ -150,6 +166,7 @@
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
     NSManagedObject *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
     cell.textLabel.text = [object valueForKey:@"title"];
+    [self handleCellAppearance:cell];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -219,14 +236,14 @@
     [fetchRequest setFetchBatchSize:20];
     
     // Edit the sort key as appropriate.
-    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"title" ascending:getDefault(@"ascending")];
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"title" ascending:[getDefault(@"ascending") boolValue]];
     NSArray *sortDescriptors = @[sortDescriptor];
     
     [fetchRequest setSortDescriptors:sortDescriptors];
     
     // Edit the section name key path and cache name if appropriate.
     // nil for section name key path means "no sections".
-    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:self.managedObjectContext sectionNameKeyPath:@"firstLetter" cacheName:@"Master"];
+    NSFetchedResultsController *aFetchedResultsController = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest managedObjectContext:self.managedObjectContext sectionNameKeyPath:@"firstLetter" cacheName:nil];
     aFetchedResultsController.delegate = self;
     self.fetchedResultsController = aFetchedResultsController;
     

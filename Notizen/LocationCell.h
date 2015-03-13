@@ -7,7 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MapKit/MapKit.h>
 
-@interface LocationCell : UITableViewCell
+@interface LocationCell : UITableViewCell {
+    CLLocationCoordinate2D myCoordinate;
+    CLLocationManager *myManager;
+}
 
+@property (strong) MKMapView *noteMapView;
+
+- (void)addAnnotationForCoordinate:(CLLocationCoordinate2D)coordinate;
+    
 @end

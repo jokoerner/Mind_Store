@@ -7,7 +7,17 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
 
-@interface AudioCell : UITableViewCell
+@interface AudioCell : UITableViewCell <AVAudioPlayerDelegate> {
+    UISlider *slider;
+    AVAudioPlayer *player;
+    UILabel *progressLabel;
+    NSTimer *timer;
+    
+    UIButton *playPauseButton;
+}
+
+- (void)initWithAudioData:(NSData *)audioData;
 
 @end

@@ -26,4 +26,9 @@
     return self;
 }
 
+- (void)stopAudio {
+    [self.sharedAudioPlayer stop];
+    self.sharedAudioPlayer = nil;
+}
+
 @end

@@ -14,6 +14,7 @@
 #import "Note.h"
 #import "NoteContent.h"
 #import "RotationController.h"
+#import <MapKit/MapKit.h>
 
 @interface AppDelegate () <UISplitViewControllerDelegate>
 
@@ -80,7 +81,7 @@
     MasterViewController *controller = (MasterViewController *)masterNavigationController.topViewController;
     controller.managedObjectContext = self.managedObjectContext;
     
-    [self createSampleData];
+    //[self createSampleData];
     
     return YES;
 }
@@ -89,6 +90,9 @@
     if (getDefault(@"ascending") == nil) {
         setDefault(@YES, @"ascending");
     }
+    if (getDefault(@"showLocation") == nil) {
+        setDefault(@YES, @"showLocation");
+    }
 }
 
 
@@ -96,7 +100,7 @@
     NSManagedObjectContext *context = self.managedObjectContext;
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"NoteContainer" inManagedObjectContext:context];
     NoteContainer *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
-    [newManagedObject setTitle:@"Notizen"];
+    [newManagedObject setTitle:@"Notizen Text 2"];
     
     entity = [NSEntityDescription entityForName:@"Note" inManagedObjectContext:context];
     Note *newNote = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
@@ -105,19 +109,30 @@
     entity = [NSEntityDescription entityForName:@"NoteContent" inManagedObjectContext:context];
     NoteContent *newContent = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
     
+//    CGDataProviderRef provider = CGImageGetDataProvider([[UIImage imageNamed:@"Background"] CGImage]);
+//    NSData* data = (id)CFBridgingRelease(CGDataProviderCopyData(provider));
     [newContent setIndex:@0];
     [newContent setDataType:@"text"];
-    [newContent setData:[@"Lorem ipsum dolor sit amet" dataUsingEncoding:NSUTF8StringEncoding]];
+    [newContent setData:[@"Lorem ipsum dolor sit amet\n crazy stuff\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad\nso bad" dataUsingEncoding:NSUTF8StringEncoding]];
+    //[newContent setData:UIImageJPEGRepresentation([UIImage imageNamed:@"Background"], 1.0)];
+    //CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(40.446947, -102.047607);
+    //NSData *data = [NSData dataWithBytes:&coordinate length:sizeof(coordinate)];
+    //[newContent setData:data];
+    
+    //NSData *data = [NSData dataWithContentsOfURL:[[NSBundle mainBundle] URLForResource:@"Audio.m4a" withExtension:nil]];
+    //[newContent setData:data];
+    
     [newContent setNote:newNote];
     
     [context save:nil];
 }
 
 - (void)deduplicate {
-    NSArray *entitiesToCheck = @[@"NoteContainer", @"Note", @"NoteContent"];
-    for (NSString *entity in entitiesToCheck) {
-        [self deduplicateEntity:entity];
-    }
+    // TODO 
+//    NSArray *entitiesToCheck = @[@"NoteContainer", @"Note", @"NoteContent"];
+//    for (NSString *entity in entitiesToCheck) {
+//        [self deduplicateEntity:entity];
+//    }
 }
 
 - (void)deduplicateEntity:(NSString *)ent {

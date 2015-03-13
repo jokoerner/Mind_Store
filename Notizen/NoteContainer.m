@@ -27,7 +27,7 @@
     if ([keyPath isEqualToString:keyPath]) {
         NSString *oldValue = [change objectForKey:NSKeyValueChangeOldKey];
         NSString *newValue = [change objectForKey:NSKeyValueChangeNewKey];
-        if (![newValue isEqualToString:oldValue]) {
+        if (!self.deleted && ![newValue isKindOfClass:[NSNull class]] && ![newValue isEqualToString:oldValue]) {
             self.firstLetter = [newValue substringToIndex:1];
         }
     }
