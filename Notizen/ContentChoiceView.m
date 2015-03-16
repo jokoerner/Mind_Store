@@ -143,14 +143,16 @@
     kreisWhite = [[UIView alloc] initWithFrame:CGRectMake(15, 15, endFrame.size.width-30, endFrame.size.height-30)];
     kreisBlack = [[UIView alloc] initWithFrame:CGRectMake(25, 25, endFrame.size.width-50, endFrame.size.height-50)];
     kreisRed = [[UIButton alloc] initWithFrame:CGRectMake(endFrame.size.width/3.0, endFrame.size.height/3.0, endFrame.size.width/3.0, endFrame.size.height/3.0)];
+    fakeKreisRed = [[UIButton alloc] initWithFrame:CGRectMake(endFrame.size.width/3.0, endFrame.size.height/3.0, endFrame.size.width/3.0, endFrame.size.height/3.0)];
     
     [kreisWhite setBackgroundColor:[UIColor whiteColor]];
     [kreisBlack setBackgroundColor:[UIColor blackColor]];
-    [kreisRed setBackgroundColor:[UIColor redColor]];
+    [fakeKreisRed setBackgroundColor:[UIColor redColor]];
     
     kreisView.layer.opacity = 0.0;
     [kreisView addSubview:kreisWhite];
     [kreisView addSubview:kreisBlack];
+    [kreisView addSubview:fakeKreisRed];
     [kreisView addSubview:kreisRed];
     [self addSubview:kreisView];
     
@@ -158,8 +160,8 @@
     kreisWhite.layer.cornerRadius = (endFrame.size.width-30.0)/2.0;
     kreisBlack.layer.masksToBounds = YES;
     kreisBlack.layer.cornerRadius = (endFrame.size.width-50.0)/2.0;
-    kreisRed.layer.masksToBounds = YES;
-    kreisRed.layer.cornerRadius = 10.0;
+    fakeKreisRed.layer.masksToBounds = YES;
+    fakeKreisRed.layer.cornerRadius = 10.0;
     
     [kreisRed addTarget:self action:@selector(stopRecording) forControlEvents:UIControlEventTouchUpInside];
     
@@ -282,8 +284,42 @@
     }
     
     // start recording
-    [recorder recordForDuration:(NSTimeInterval) 10];
+    [recorder record];
+    [self blink1];
+}
+
+- (void)blink1 {
+    if (!recorder.isRecording) {
+        return;
+    }
+    CGRect frame = fakeKreisRed.frame;
+    frame.origin.x -= 10.0;
+    frame.origin.y -= 10.0;
+    frame.size.width += 20.0;
+    frame.size.height += 20.0;
     
+    [UIView animateWithDuration:0.5 animations:^{
+        [fakeKreisRed setFrame:frame];
+    } completion:^(BOOL finished) {
+        [self blink2];
+    }];
+}
+
+- (void)blink2 {
+    if (!recorder.isRecording) {
+        return;
+    }
+    CGRect frame = fakeKreisRed.frame;
+    frame.origin.x += 10.0;
+    frame.origin.y += 10.0;
+    frame.size.width -= 20.0;
+    frame.size.height -= 20.0;
+    
+    [UIView animateWithDuration:0.5 animations:^{
+        [fakeKreisRed setFrame:frame];
+    } completion:^(BOOL finished) {
+        [self blink1];
+    }];
 }
 
 - (void) stopRecording{
@@ -328,7 +364,7 @@
 - (void)audioRecorderDidFinishRecording:(AVAudioRecorder *) aRecorder successfully:(BOOL)flag
 {
     
-    NSLog (@"audioRecorderDidFinishRecording:successfully:");
+    //NSLog (@"audioRecorderDidFinishRecording:successfully:");
     // your actions here
     dimView.backgroundColor = [UIColor blackColor];
 }

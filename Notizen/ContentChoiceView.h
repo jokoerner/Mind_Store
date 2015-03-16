@@ -18,6 +18,7 @@
     UIView *kreisView;
     UIView *kreisWhite;
     UIView *kreisBlack;
+    UIView *fakeKreisRed;
     UIButton *kreisRed;
     AVAudioRecorder *recorder;
     NSString *recorderFilePath;
