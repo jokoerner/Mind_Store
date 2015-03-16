@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 #import <AVFoundation/AVFoundation.h>
+#import <UIKit/UIKit.h>
 
 #define post(name) [[NSNotificationCenter defaultCenter] postNotificationName:name object:nil]
 #define postWithObject(name, anObject) [[NSNotificationCenter defaultCenter] postNotificationName:name object:anObject]
@@ -22,6 +23,7 @@
 #define customBackgroundColor [UIColor colorWithPatternImage:[UIImage imageNamed:@"Background"]]
 #define setBackgroundForView(theView) [theView insertSubview:[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"Background"]] atIndex:0]
 #define customTableFont [UIFont fontWithName:@"HelveticaNeue-Light" size:22]
+#define customTableFontOfSize(theSize) [UIFont fontWithName:@"HelveticaNeue-Light" size:theSize]
 #define customMediumTableFont [UIFont fontWithName:@"HelveticaNeue-Light" size:20]
 #define customSmallTableFont [UIFont fontWithName:@"HelveticaNeue-Light" size:18]
 #define customTintColor [UIColor colorWithHue:186.0/360.0 saturation:0.93 brightness:0.58 alpha:1.0]
@@ -35,6 +37,8 @@
 
 + (id)shared;
 - (void)stopAudio;
+
+- (UIButton *)newAddStuffButton;
 
 @property (strong) AVAudioPlayer *sharedAudioPlayer;
 

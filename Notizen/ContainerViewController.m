@@ -87,10 +87,24 @@
     self.navigationItem.rightBarButtonItems = @[addButton, self.editButtonItem];
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    observe(self, @selector(handleAccessoryButtonAction:), @"accessoryButtonAction");
+}
+
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     
+    removeObserverForName(self, @"accessoryButtonAction");
+    
     [[StoreHandler shared] stopAudio];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    if (self.fetchedResultsController.fetchedObjects.count == 0) {
+        [self insertNewObject:nil];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -106,7 +120,23 @@
     NoteContent *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
     
     if (note) {
-        [newManagedObject setIndex:@(note.noteContents.count)];
+        if (tempIndexPath) {
+            //Indices danach erhöhen
+            NSSortDescriptor *sd = [NSSortDescriptor sortDescriptorWithKey:@"index" ascending:YES];
+            NSArray *allObjects = [note.noteContents.allObjects sortedArrayUsingDescriptors:@[sd]];
+            for (int i = (int)tempIndexPath.row+1; i < allObjects.count; i++) {
+                NoteContent *aContent = [allObjects objectAtIndex:i];
+                [aContent setIndex:@(i+1)];
+            }
+            
+            [newManagedObject setIndex:@(tempIndexPath.row+1)];
+            
+            tempIndexPath = nil;
+            editNote = nil;
+        }
+        else {
+            [newManagedObject setIndex:@(note.noteContents.count)];
+        }
         [newManagedObject setNote:note];
     }
     else {
@@ -116,6 +146,17 @@
         [newManagedObject setNote:newNote];
         [newManagedObject setIndex:@0];
     }
+    
+    return newManagedObject;
+}
+
+- (NoteContent *)neuerNoteContentInNote:(Note *)note atIndex:(NSInteger)index {
+    NSManagedObjectContext *context = self.managedObjectContext;
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"NoteContent" inManagedObjectContext:context];
+    NoteContent *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+    
+    [newManagedObject setIndex:@(index)];
+    [newManagedObject setNote:note];
     
     return newManagedObject;
 }
@@ -140,9 +181,10 @@
     [textView setOffset:64.0];
     CGRect frame = [self.view convertRect:contentChoice.frame fromView:self.navigationController.view.superview.superview.superview];
     [textView showFromFrame:frame onTopOfView:self.navigationController.view];
+    UIBarButtonItem *addItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNextNewItem:)];
     UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissTextView:)];
     UIBarButtonItem *trash = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteTextView:)];
-    [self.navigationItem setRightBarButtonItems:@[item] animated:YES];
+    [self.navigationItem setRightBarButtonItems:@[item, addItem] animated:YES];
     [self.navigationItem setHidesBackButton:YES animated:YES];
     [self.navigationItem setLeftBarButtonItems:@[trash] animated:YES];
     [self.tableView setScrollEnabled:NO];
@@ -153,7 +195,13 @@
 }
 
 - (void)audio:(NSNotification *)notification {
+    NSData *audioData = notification.object;
     
+    NoteContent *newContent = [self neuerNoteContentInNote:editNote];
+    [newContent setDataType:@"audio"];
+    [newContent setData:audioData];
+    
+    [self.managedObjectContext save:nil];
 }
 
 - (void)location:(NSNotification *)notification {
@@ -185,6 +233,30 @@
     contentChoice = nil;
 }
 
+- (void)insertNextNewItem:(UIBarButtonItem *)item {
+    sequence = YES;
+    
+    if (textView) {
+        [self dismissTextView:nil];
+    }
+    else if (imageView) {
+        [self dismissImageView:nil];
+    }
+    else if (mapView) {
+        [self dismissMapView:nil];
+    }
+    
+    [self insertNewObject:nil];
+}
+
+- (void)insertItemAfterIndexPath:(NSIndexPath *)indexPath {
+    //Content-Objekt einfügen
+    tempIndexPath = indexPath;
+    NoteContent *theContent = [self.fetchedResultsController objectAtIndexPath:indexPath];
+    editNote = theContent.note;
+    [self insertNewObject:nil];
+}
+
 #pragma mark - Table View
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -213,6 +285,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     NoteContent *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
     NSString *dataType = object.dataType;
+    
     if ([dataType isEqualToString:@"text"]) {
         TextCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TextCell" forIndexPath:indexPath];
         NSString *text = [[NSString alloc] initWithData:object.data encoding:NSUTF8StringEncoding];
@@ -220,6 +293,7 @@
         CGFloat height = [self tableView:tableView heightForRowAtIndexPath:indexPath];
         [cell.noteTextView setFrame:CGRectMake(5, 0, self.view.frame.size.width-10, height)];
         
+        //[cell setmuchEditing:self.editing];
         [self handleCellAppearance:cell];
         return cell;
     }
@@ -228,8 +302,9 @@
         UIImage *image = [UIImage imageWithData:object.data];
         cell.noteImageView.image = image;
         CGFloat height = [self tableView:tableView heightForRowAtIndexPath:indexPath];
-        [cell.noteImageView setFrame:CGRectMake(5, 0, self.view.frame.size.width-10, height)];
+        [cell.noteImageView setFrame:CGRectMake(10, 0, self.view.frame.size.width-20, height)];
         
+        [cell setMuchEditing:self.editing];
         [self handleCellAppearance:cell];
         return cell;
     }
@@ -240,24 +315,26 @@
         AudioCell *cell = [tableView dequeueReusableCellWithIdentifier:@"AudioCell" forIndexPath:indexPath];
         [cell initWithAudioData:object.data];
         
+        [cell setMuchEditing:self.editing];
         [self handleCellAppearance:cell];
         return cell;
     }
     else if ([dataType isEqualToString:@"location"]) {
         LocationCell *cell = [tableView dequeueReusableCellWithIdentifier:@"LocationCell" forIndexPath:indexPath];
         CGFloat height = [self tableView:tableView heightForRowAtIndexPath:indexPath];
-        [cell.noteMapView setFrame:CGRectMake(5, 0, self.view.frame.size.width-10, height)];
+        [cell.noteMapView setFrame:CGRectMake(10, 0, self.view.frame.size.width-20, height)];
         NSData *data = object.data;
         CLLocationCoordinate2D coordinate;
         [data getBytes:&coordinate length:sizeof(coordinate)];
         [cell addAnnotationForCoordinate:coordinate];
         
+        [cell setMuchEditing:self.editing];
         [self handleCellAppearance:cell];
         return cell;
     }
     
     UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:nil];
-    cell.textLabel.text = @"Fehler - bitte löschen";
+    cell.textLabel.text = NSLocalizedString(@"Error - Please delete this", nil);
     return cell;
 }
 
@@ -327,6 +404,15 @@
     }
 }
 
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return NO;
+}
+
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
+    
+}
+
 - (NSArray *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewRowAction *action1 = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:NSLocalizedString(@"Delete", nil) handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
         [self tableView:tableView commitEditingStyle:UITableViewCellEditingStyleDelete forRowAtIndexPath:indexPath];
@@ -336,10 +422,20 @@
         // TODO: Share
     }];
     
-    return @[action1, action2];
+    UITableViewRowAction *action3 = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:NSLocalizedString(@"Insert", nil) handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
+        [self insertItemAfterIndexPath:indexPath];
+        [self setEditing:NO animated:YES];
+    }];
+    [action3 setBackgroundColor:[UIColor orangeColor]];
+    
+    return @[action1, action3, action2];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.editing) {
+        return;
+    }
+    
     NoteContent *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
     editingObject = object;
     if ([object.dataType isEqualToString:@"text"]) {
@@ -348,9 +444,10 @@
         [textView setOffset:64.0];
         CGRect frame = [self.view convertRect:cell.noteTextView.frame fromView:cell];
         [textView showFromFrame:frame onTopOfView:self.navigationController.view];
+        UIBarButtonItem *addItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNextNewItem:)];
         UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissTextView:)];
         UIBarButtonItem *trash = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteTextView:)];
-        [self.navigationItem setRightBarButtonItems:@[item] animated:YES];
+        [self.navigationItem setRightBarButtonItems:@[item, addItem] animated:YES];
         [self.navigationItem setHidesBackButton:YES animated:YES];
         [self.navigationItem setLeftBarButtonItems:@[trash] animated:YES];
         [self.tableView setScrollEnabled:NO];
@@ -365,7 +462,8 @@
         UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissImageView:)];
         UIBarButtonItem *trash = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteImageView:)];
         UIBarButtonItem *newImage = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(takePhoto:)];
-        [self.navigationItem setRightBarButtonItems:@[item] animated:YES];
+        UIBarButtonItem *addItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNextNewItem:)];
+        [self.navigationItem setRightBarButtonItems:@[item, addItem] animated:YES];
         [self.navigationItem setHidesBackButton:YES animated:YES];
         [self.navigationItem setLeftBarButtonItems:@[trash, newImage] animated:YES];
         [self.tableView setScrollEnabled:NO];
@@ -381,10 +479,11 @@
         [mapView setOffset:64.0];
         CGRect frame = [self.view convertRect:cell.noteMapView.frame fromView:cell];
         [mapView showFromFrame:frame onTopOfView:self.navigationController.view];
-        UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissMapView)];
+        UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissMapView:)];
         UIBarButtonItem *trash = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteMapView)];
+        UIBarButtonItem *addItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNextNewItem:)];
         observe(self, @selector(openLocationInMaps), @"openLocationInMaps");
-        [self.navigationItem setRightBarButtonItems:@[item] animated:YES];
+        [self.navigationItem setRightBarButtonItems:@[item, addItem] animated:YES];
         [self.navigationItem setHidesBackButton:YES animated:YES];
         [self.navigationItem setLeftBarButtonItems:@[trash] animated:YES];
         [self.tableView setScrollEnabled:NO];
@@ -490,7 +589,7 @@
 {
     [self.tableView endUpdates];
     
-    [self.tableView performSelector:@selector(reloadSectionIndexTitles) withObject:nil afterDelay:0.3];
+    [self.tableView performSelector:@selector(reloadSectionIndexTitles) withObject:nil afterDelay:0.8];
 //    [self.tableView reloadSectionIndexTitles];
 }
 
@@ -503,28 +602,38 @@
         editingObject = nil;
     }
     
+    editNote = nil;
+    sequence = NO;
+    
     [textView dismiss];
     textView = nil;
     [self resetBarButtonItems];
     [self.tableView setScrollEnabled:YES];
 }
 
-- (void)dismissTextView:(NSNotification *)notification {
+- (void)dismissTextView:(UIBarButtonItem *)item {
     if (editingObject) {
         NoteContent *object = editingObject;
         [object setData:[textView.textView.text dataUsingEncoding:NSUTF8StringEncoding]];
         [self.managedObjectContext save:nil];
+        editNote = editingObject.note;
         editingObject = nil;
     }
     else {
         //Neue Text-Notiz erstellen
         NoteContent *newContent = [self neuerNoteContentInNote:editNote];
         [newContent setDataType:@"text"];
+        editNote = newContent.note;
         
         NSData* data = [textView.textView.text dataUsingEncoding:NSUTF8StringEncoding];
         [newContent setData:data];
         
         [self.managedObjectContext save:nil];
+    }
+    
+    if (item) {
+        editNote = nil;
+        sequence = NO;
     }
     
     [textView dismiss];
@@ -575,10 +684,13 @@
     [self.tableView setScrollEnabled:YES];
     [self tableView:self.tableView commitEditingStyle:UITableViewCellEditingStyleDelete forRowAtIndexPath:indexPath];
     editingObject = nil;
+    editNote = nil;
+    sequence = NO;
 }
 
-- (void)dismissImageView:(NSNotification *)notification {
+- (void)dismissImageView:(UIBarButtonItem *)item {
     NoteContent *object = editingObject;
+    editNote = object.note;
     [self.tableView setUserInteractionEnabled:YES];
     
     if (imageView.didTakePhoto) {
@@ -588,8 +700,12 @@
         NSData* data = UIImageJPEGRepresentation(imageView.imageView.image, 0.9);
         [object setData:data]; //TODO? : evtl. in async Block
         
-        
         [self.managedObjectContext save:nil];
+    }
+    
+    if (item) {
+        editNote = nil;
+        sequence = NO;
     }
     
     [imageView dismiss];
@@ -603,13 +719,20 @@
 
 #pragma mark - ModalMapView
 
-- (void)dismissMapView {
+- (void)dismissMapView:(UIBarButtonItem *)item {
     NoteContent *object = editingObject;
+    editNote = object.note;
     [self.tableView setUserInteractionEnabled:YES];
     
     NSData* data = [NSData dataWithBytes:&tempCoordinate length:sizeof(tempCoordinate)];
     [object setData:data];
     [self.managedObjectContext save:nil];
+    
+    if (item) {
+        editNote = nil;
+        sequence = NO;
+    }
+    
     [mapView dismiss];
     mapView = nil;
     [self resetBarButtonItems];
@@ -627,10 +750,12 @@
     [self.tableView setScrollEnabled:YES];
     [self tableView:self.tableView commitEditingStyle:UITableViewCellEditingStyleDelete forRowAtIndexPath:indexPath];
     editingObject = nil;
+    editNote = nil;
+    sequence = NO;
 }
 
 - (void)openLocationInMaps {
-    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Möchten Sie die App verlassen?" delegate:self cancelButtonTitle:@"Abbrechen" destructiveButtonTitle:@"In Karten öffnen" otherButtonTitles:nil, nil];
+    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:NSLocalizedString(@"Do you want to leave the app?", nil) delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:NSLocalizedString(@"Open in Apple Maps", nil) otherButtonTitles:nil, nil];
     sheet.tag = 1;
     [sheet showInView:self.view];
 }
@@ -644,6 +769,106 @@
             [item openInMapsWithLaunchOptions:nil];
         }
     }
+    else if (actionSheet.tag == 2) { //Ausgewählte löschen
+        if (buttonIndex != actionSheet.cancelButtonIndex) {
+            [self deleteSelectedItemsImpl];
+        }
+    }
+}
+
+#pragma mark - Edit Toolbar
+
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+    if (editing) {
+        [self showEditToolbar];
+    }
+    else {
+        [self dismissEditToolbar];
+    }
+}
+
+- (UIToolbar *)editToolbar {
+    UIToolbar *theToolbar = [[UIToolbar alloc] initWithFrame:CGRectMake((self.view.frame.size.width-300)/2, self.view.frame.size.height, 300, 44)];
+    
+    UIBarButtonItem *delete = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteSelectedItems:)];
+    UIBarButtonItem *share = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareSelectedItems:)];
+    
+    UIBarButtonItem *flex = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    [theToolbar setItems:@[flex, share, flex, delete, flex]];
+    
+    [theToolbar.layer setMasksToBounds:YES];
+    [theToolbar.layer setCornerRadius:5.0];
+    
+    return theToolbar;
+}
+
+- (void)showEditToolbar {
+    if (editToolbar) {
+        return;
+    }
+    editToolbar = [self editToolbar];
+    [self.navigationController.view addSubview:editToolbar];
+    [UIView animateWithDuration:0.3 animations:^{
+        CGRect frame = editToolbar.frame;
+        frame.origin.y -= 50;
+        [editToolbar setFrame:frame];
+    }];
+}
+
+- (void)dismissEditToolbar {
+    if (!editToolbar) {
+        return;
+    }
+    [UIView animateWithDuration:0.3 animations:^{
+        CGRect frame = editToolbar.frame;
+        frame.origin.y += 50;
+        [editToolbar setFrame:frame];
+    } completion:^(BOOL finished) {
+        [editToolbar removeFromSuperview];
+        editToolbar = nil;
+    }];
+}
+
+- (void)deleteSelectedItems:(UIBarButtonItem *)item {
+    NSString *destructive = [NSString stringWithFormat:@"%@ (%ld)", NSLocalizedString(@"Delete", nil), (long)(self.tableView.indexPathsForSelectedRows.count)];
+    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:destructive otherButtonTitles:nil, nil];
+    [sheet setTag:2];
+    [sheet showFromBarButtonItem:item animated:YES];
+}
+
+- (void)deleteSelectedItemsImpl {
+    NSArray *selected = self.tableView.indexPathsForSelectedRows;
+    
+    NSMutableArray *collectedObjects = [NSMutableArray array];
+    NSMutableArray *collectedObjects2 = [NSMutableArray array];
+    
+    //Content-Objekte sammeln
+    for (NSIndexPath *indexPath in selected) {
+        NoteContent *aContentObject = [self.fetchedResultsController objectAtIndexPath:indexPath];
+        [collectedObjects addObject:aContentObject];
+    }
+    
+    //Content-Objekte löschen, Note-Objekte sammeln
+    for (NSInteger i = collectedObjects.count-1; i >= 0; i--) {
+        NoteContent *aContentObject = [collectedObjects objectAtIndex:i];
+        Note *aNote = (aContentObject.note.noteContents.count > 1) ? nil : aContentObject.note;
+        
+        [self.managedObjectContext deleteObject:aContentObject];
+        if (aNote) [collectedObjects2 addObject:aNote];
+    }
+    
+    //Note-Objekte löschen
+    for (NSInteger i = collectedObjects2.count-1; i >= 0; i--) {
+        Note *aNote = [collectedObjects2 objectAtIndex:i];
+        [self.managedObjectContext deleteObject:aNote];
+    }
+    
+    [self.managedObjectContext save:nil];
+}
+
+- (void)shareSelectedItems:(UIBarButtonItem *)item {
+    
 }
 
 #pragma mark - Rotation
@@ -692,6 +917,14 @@
         return YES;
     }
     return NO;
+}
+
+#pragma mark - accessoryButtonAction
+
+- (void)handleAccessoryButtonAction:(NSNotification *)notification {
+    UITableViewCell *cell = notification.object;
+    NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
+    [self insertItemAfterIndexPath:indexPath];
 }
 
 @end

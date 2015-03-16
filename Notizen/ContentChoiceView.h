@@ -7,12 +7,25 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
 
-@interface ContentChoiceView : UIView {
+@interface ContentChoiceView : UIView <AVAudioRecorderDelegate> {
     CGRect endFrame;
     CGRect startFrame;
     
     UIView *dimView;
+    
+    UIView *kreisView;
+    UIView *kreisWhite;
+    UIView *kreisBlack;
+    UIButton *kreisRed;
+    AVAudioRecorder *recorder;
+    NSString *recorderFilePath;
+    
+    UIButton *textButton;
+    UIButton *audioButton;
+    UIButton *photoButton;
+    UIButton *locationButton;
 }
 
 - (id)initWithFrame:(CGRect)frame;

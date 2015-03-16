@@ -15,6 +15,7 @@
 }
 
 @property (strong) MKMapView *noteMapView;
+@property (nonatomic) BOOL muchEditing;
 
 - (void)addAnnotationForCoordinate:(CLLocationCoordinate2D)coordinate;
     

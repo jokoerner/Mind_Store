@@ -90,8 +90,8 @@
     if (getDefault(@"ascending") == nil) {
         setDefault(@YES, @"ascending");
     }
-    if (getDefault(@"showLocation") == nil) {
-        setDefault(@YES, @"showLocation");
+    if (getDefault(@"recordQualityVoice") == nil) {
+        setDefault(@YES, @"recordQualityVoice");
     }
 }
 
@@ -287,7 +287,7 @@
     if (!coordinator) {
         return nil;
     }
-    _managedObjectContext = [[NSManagedObjectContext alloc] init];
+    _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
     [_managedObjectContext setPersistentStoreCoordinator:coordinator];
     return _managedObjectContext;
 }

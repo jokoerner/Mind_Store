@@ -31,4 +31,14 @@
     self.sharedAudioPlayer = nil;
 }
 
+- (UIButton *)newAddStuffButton {
+    UIButton *accessoryButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
+    [accessoryButton setImage:[UIImage imageNamed:@"Go"] forState:UIControlStateNormal];
+    [accessoryButton setBackgroundColor:[UIColor whiteColor]];
+    accessoryButton.layer.masksToBounds = YES;
+    accessoryButton.layer.cornerRadius = 5.0;
+    [accessoryButton.layer setOpacity:0.8];
+    return accessoryButton;
+}
+
 @end

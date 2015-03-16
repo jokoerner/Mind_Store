@@ -22,7 +22,13 @@
     [self.noteTextView setTextAlignment:NSTextAlignmentJustified];
     [self.noteTextView setUserInteractionEnabled:NO];
     
-    [self setSelectionStyle:UITableViewCellSelectionStyleNone];
+    UIButton *accessoryButton = [[StoreHandler shared] newAddStuffButton];
+    [accessoryButton addTarget:self action:@selector(accessoryButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+    [self setEditingAccessoryView:accessoryButton];
+}
+
+- (void)accessoryButtonAction:(UIButton *)sender {
+    postWithObject(@"accessoryButtonAction", self);
 }
 
 - (void)layoutSubviews {
@@ -33,13 +39,40 @@
     
     if (height <= 44.0) [self.noteTextView setFont:customTableFont];
     
-    if (![self.subviews containsObject:self.noteTextView]) [self addSubview:self.noteTextView];
+    if (![self.contentView.subviews containsObject:self.noteTextView]) [self.contentView addSubview:self.noteTextView];
+    
+    //[self moveSubviews];
+    [super layoutSubviews];
+}
+
+- (void)moveSubviews {
+    if (self.editing && !_muchEditing) {
+        _muchEditing = YES;
+        for (UIView *aSubview in self.subviews) {
+            CGRect oldFrame = aSubview.frame;
+            oldFrame.origin.x += 35;
+            [aSubview setFrame:oldFrame];
+        }
+    }
+    else if (!self.editing && _muchEditing) {
+        _muchEditing = NO;
+        for (UIView *aSubview in self.subviews) {
+            CGRect oldFrame = aSubview.frame;
+            oldFrame.origin.x -= 35;
+            [aSubview setFrame:oldFrame];
+        }
+    }
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
-
     // Configure the view for the selected state
+    if (self.editing && selected) {
+        [self.noteTextView setTextColor:[UIColor blackColor]];
+    }
+    else if (self.editing && !selected) {
+        [self.noteTextView setTextColor:[UIColor whiteColor]];
+    }
 }
 
 @end

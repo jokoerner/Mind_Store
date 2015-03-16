@@ -26,6 +26,14 @@
     playPauseButton = [[UIButton alloc] initWithFrame:CGRectNull];
     [playPauseButton setImage:[UIImage imageNamed:@"Play"] forState:UIControlStateNormal];
     [playPauseButton addTarget:self action:@selector(playPauseAudio:) forControlEvents:UIControlEventTouchUpInside];
+    
+    UIButton *accessoryButton = [[StoreHandler shared] newAddStuffButton];
+    [accessoryButton addTarget:self action:@selector(accessoryButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+    [self setEditingAccessoryView:accessoryButton];
+}
+
+- (void)accessoryButtonAction:(UIButton *)sender {
+    postWithObject(@"accessoryButtonAction", self);
 }
 
 - (void)layoutSubviews {
@@ -34,13 +42,53 @@
     [slider setFrame:CGRectMake(100, 5, self.frame.size.width-105, 50)];
     [playPauseButton setFrame:CGRectMake(5, 10, 40, 40)];
     
-    if (![self.subviews containsObject:playPauseButton]) [self addSubview:playPauseButton];
-    if (![self.subviews containsObject:progressLabel]) [self addSubview:progressLabel];
-    if (![self.subviews containsObject:slider]) [self addSubview:slider];
+    if (![self.contentView.subviews containsObject:playPauseButton]) [self.contentView addSubview:playPauseButton];
+    if (![self.contentView.subviews containsObject:progressLabel]) [self.contentView addSubview:progressLabel];
+    if (![self.contentView.subviews containsObject:slider]) [self.contentView addSubview:slider];
+    
+    //[self moveSubviews];
+    [super layoutSubviews];
+}
+
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+    if (editing) {
+        [slider setUserInteractionEnabled:NO];
+        [playPauseButton setUserInteractionEnabled:NO];
+    }
+    else {
+        [slider setUserInteractionEnabled:YES];
+        [playPauseButton setUserInteractionEnabled:YES];
+    }
+}
+
+- (void)moveSubviews {
+    if (self.editing && !_muchEditing) {
+        _muchEditing = YES;
+        for (UIView *aSubview in self.subviews) {
+            CGRect oldFrame = aSubview.frame;
+            oldFrame.origin.x += 35;
+            [aSubview setFrame:oldFrame];
+        }
+    }
+    else if (!self.editing && _muchEditing) {
+        _muchEditing = NO;
+        for (UIView *aSubview in self.subviews) {
+            CGRect oldFrame = aSubview.frame;
+            oldFrame.origin.x -= 35;
+            [aSubview setFrame:oldFrame];
+        }
+    }
 }
 
 - (void)initWithAudioData:(NSData *)audioData {
     NSError *error;
+    
+    AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+    [audioSession overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker error:nil];
+    [audioSession setCategory:AVAudioSessionCategoryPlayback error:nil];
+    [[AVAudioSession sharedInstance] setActive: YES error: nil];
+    
     player = [[AVAudioPlayer alloc] initWithData:audioData error:&error];
     [player setDelegate:self];
     [player prepareToPlay];
@@ -56,6 +104,7 @@
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag {
     [timer invalidate];
+    [self updateProgress];
     [self setPlayButton];
 }
 
@@ -104,7 +153,7 @@
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    //[super setSelected:selected animated:animated];
+    if (self.editing) [super setSelected:selected animated:animated];
 
     // Configure the view for the selected state
 }

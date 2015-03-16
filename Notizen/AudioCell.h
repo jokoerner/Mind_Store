@@ -19,5 +19,6 @@
 }
 
 - (void)initWithAudioData:(NSData *)audioData;
+@property (nonatomic) BOOL muchEditing;
 
 @end

@@ -21,6 +21,12 @@
     
     Note *editNote;
     
+    UIToolbar *editToolbar;
+    
+    NSIndexPath *tempIndexPath;
+    
+    BOOL sequence;
+    
     ContentChoiceView *contentChoice;
     
     CLLocationManager *locationManager;

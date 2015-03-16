@@ -8,8 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TextCell : UITableViewCell
+@interface TextCell : UITableViewCell {
+    UIButton *addButton;
+}
 
 @property (strong) UITextView *noteTextView;
+@property (nonatomic) BOOL muchEditing;
 
 @end

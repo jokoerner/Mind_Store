@@ -12,10 +12,13 @@
 
 @class ContainerViewController;
 
-@interface MasterViewController : UITableViewController <NSFetchedResultsControllerDelegate> {
+@interface MasterViewController : UITableViewController <NSFetchedResultsControllerDelegate, UITextFieldDelegate> {
     UIImageView *topImageview;
     UIImageView *midImageview;
     UIImageView *botImageview;
+    
+    UITextField *myTextField;
+    UIButton *acceptButton;
 }
 
 @property (strong, nonatomic) ContainerViewController *detailViewController;

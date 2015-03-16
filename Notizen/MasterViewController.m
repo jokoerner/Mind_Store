@@ -12,6 +12,8 @@
 #import "Note.h"
 #import "NoteContent.h"
 
+#define DEGREES_TO_RADIANS(d) (d * M_PI / 180)
+
 @interface MasterViewController ()
 
 @end
@@ -46,13 +48,17 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib
-    self.navigationItem.leftBarButtonItem = self.editButtonItem;
-
-    UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
-    self.navigationItem.rightBarButtonItem = addButton;
+    [self resetBarButtonItems];
     self.detailViewController = (ContainerViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
     
     [self handleAppearance];
+}
+
+- (void)resetBarButtonItems {
+    self.navigationItem.leftBarButtonItem = self.editButtonItem;
+    
+    UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
+    self.navigationItem.rightBarButtonItem = addButton;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -92,23 +98,123 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - Neues Objekt erstellen
+
 - (void)insertNewObject:(id)sender {
-    NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
-    NSEntityDescription *entity = [[self.fetchedResultsController fetchRequest] entity];
-    NSManagedObject *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(dismissNewObjectStuffAndMoveToObject:)];
+    self.navigationItem.rightBarButtonItems = @[];
+    
+    myTextField = [[UITextField alloc] initWithFrame:CGRectMake(5, -50, self.view.frame.size.width-80, 60)];
+    [myTextField setTextColor:[UIColor whiteColor]];
+    [myTextField setFont:customTableFontOfSize(30)];
+    myTextField.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.15];
+    [myTextField.layer setMasksToBounds:YES];
+    [myTextField.layer setCornerRadius:5];
+    [myTextField setDelegate:self];
+    [self.tableView.superview addSubview:myTextField];
+    
+    acceptButton = [[UIButton alloc] initWithFrame:CGRectMake(self.view.frame.size.width, 64 + (self.view.frame.size.height-64-250)/2-30, 60, 60)];
+    [acceptButton addTarget:self action:@selector(accepted) forControlEvents:UIControlEventTouchUpInside];
+    [acceptButton setImage:[UIImage imageNamed:@"Go"] forState:UIControlStateNormal];
+    acceptButton.transform = CGAffineTransformMakeRotation(DEGREES_TO_RADIANS(-90));
+    [self.tableView.superview addSubview:acceptButton];
+    
+    [UIView animateWithDuration:0.5 animations:^{
+        CGFloat width = self.tableView.frame.size.width;
+        CGFloat height = self.tableView.frame.size.height;
+        [self.tableView setFrame:CGRectMake(0, self.view.frame.size.height, width, height)];
         
-    // If appropriate, configure the new managed object.
-    // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
-    [newManagedObject setValue:[NSDate date] forKey:@"timeStamp"];
-        
-    // Save the context.
-    NSError *error = nil;
-    if (![context save:&error]) {
-        // Replace this implementation with code to handle the error appropriately.
-        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-        abort();
+        [myTextField setFrame:CGRectMake(5, 64 + (self.view.frame.size.height-64-250)/2-30, self.view.frame.size.width-80, 60)];
+    } completion:^(BOOL finished) {
+        [myTextField becomeFirstResponder];
+        [UIView animateWithDuration:0.3 animations:^{
+            [acceptButton setFrame:CGRectMake(self.view.frame.size.width-65, 64 + (self.view.frame.size.height-64-250)/2-30, 60, 60)];
+        } completion:^(BOOL finished) {
+            
+        }];
+    }];
+    
+//    NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
+//    NSEntityDescription *entity = [[self.fetchedResultsController fetchRequest] entity];
+//    NSManagedObject *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+//        
+//    // If appropriate, configure the new managed object.
+//    // Normally you should use accessor methods, but using KVC here avoids the need to add a custom class to the template.
+//    [newManagedObject setValue:[NSDate date] forKey:@"timeStamp"];
+//        
+//    // Save the context.
+//    NSError *error = nil;
+//    if (![context save:&error]) {
+//        // Replace this implementation with code to handle the error appropriately.
+//        // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+//        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+//        abort();
+//    }
+}
+
+- (void)accepted {
+    if (myTextField.text.length > 0) {
+        [self insertNewObjectWithTitle:myTextField.text];
     }
+    else {
+        [self dismissNewObjectStuffAndMoveToObject:nil];
+    }
+}
+
+- (void)insertNewObjectWithTitle:(NSString *)theTitle {
+    NSManagedObjectContext *context = self.managedObjectContext;
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"NoteContainer" inManagedObjectContext:context];
+    NoteContainer *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+    [newManagedObject setTitle:theTitle];
+    [context save:nil];
+    
+//    ContainerViewController *controller = (ContainerViewController *)[[[UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]] instantiateViewControllerWithIdentifier:@"Detail"] topViewController];
+//    [controller setContainer:(NoteContainer *)newManagedObject];
+//    [controller setManagedObjectContext:self.managedObjectContext];
+//    [controller setTitle:[newManagedObject valueForKey:@"title"]];
+//    controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
+//    controller.navigationItem.leftItemsSupplementBackButton = YES;
+//    [self.navigationController pushViewController:controller animated:YES];
+    
+    [self dismissNewObjectStuffAndMoveToObject:newManagedObject];
+}
+
+- (void)dismissNewObjectStuffAndMoveToObject:(NoteContainer *)object {
+    [myTextField resignFirstResponder];
+    
+    [UIView animateWithDuration:0.5 animations:^{
+        CGFloat width = self.tableView.frame.size.width;
+        CGFloat height = self.tableView.frame.size.height;
+        
+        [self.tableView setFrame:CGRectMake(0, 0, width, height)];
+        [myTextField setFrame:CGRectMake(self.view.frame.size.width, 64 + (self.view.frame.size.height-64-250)/2-30, self.view.frame.size.width-80, 60)];
+        [acceptButton setFrame:CGRectMake(self.view.frame.size.width+self.view.frame.size.width-80+5, 64 + (self.view.frame.size.height-64-250)/2-30, 60, 60)];
+    } completion:^(BOOL finished) {
+        [myTextField removeFromSuperview];
+        myTextField = nil;
+        [acceptButton removeFromSuperview];
+        acceptButton = nil;
+    }];
+    
+    if (object) {
+//        NSIndexPath *indexPath = [self.fetchedResultsController indexPathForObject:object];
+//        [self.tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
+//        [self tableView:self.tableView didSelectRowAtIndexPath:indexPath];
+    }
+    
+    [self resetBarButtonItems];
+}
+
+#pragma mark - TextField Delegate
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField {
+    if (myTextField.text.length > 0) {
+        [self insertNewObjectWithTitle:myTextField.text];
+    }
+    else {
+        [self dismissNewObjectStuffAndMoveToObject:nil];
+    }
+    return YES;
 }
 
 #pragma mark - Segues
@@ -312,7 +418,7 @@
 }
 
 /*
-// Implementing the above methods to update the table view in response to individual changes may have performance implications if a large number of changes are made simultaneously. If this proves to be an issue, you can instead just implement controllerDidChangeContent: which notifies the delegate that all section and object changes have been processed. 
+// Implementing the above methods to update the table view in response to individual changes may have performance implications if a large number of changes are made simultaneously. If this proves to be an issue, you can instead just implement controllerDidChangeContent: which notifies the delegate that all section and object changes have been processed.
  
  - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
 {

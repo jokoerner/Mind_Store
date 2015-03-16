@@ -65,7 +65,7 @@
     
     MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
     [annotation setCoordinate:coordinate];
-    [annotation setTitle:@"Notiz"]; //You can set the subtitle too
+    [annotation setTitle:NSLocalizedString(@"Note", nil)]; //You can set the subtitle too
     [self.mapView addAnnotation:annotation];
     
     MKCoordinateRegion region;

@@ -8,8 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ImageCell : UITableViewCell
+@interface ImageCell : UITableViewCell {
+
+}
 
 @property (strong) UIImageView *noteImageView;
+@property (nonatomic) BOOL muchEditing;
 
 @end

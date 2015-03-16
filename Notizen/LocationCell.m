@@ -29,6 +29,14 @@
     
     myManager = [[CLLocationManager alloc] init];
     [myManager requestWhenInUseAuthorization];
+    
+    UIButton *accessoryButton = [[StoreHandler shared] newAddStuffButton];
+    [accessoryButton addTarget:self action:@selector(accessoryButtonAction:) forControlEvents:UIControlEventTouchUpInside];
+    [self setEditingAccessoryView:accessoryButton];
+}
+
+- (void)accessoryButtonAction:(UIButton *)sender {
+    postWithObject(@"accessoryButtonAction", self);
 }
 
 - (void)showLocationInMaps {
@@ -43,7 +51,7 @@
     
     MKPointAnnotation *annotation = [[MKPointAnnotation alloc] init];
     [annotation setCoordinate:coordinate];
-    [annotation setTitle:@"Notiz"]; //You can set the subtitle too
+    [annotation setTitle:NSLocalizedString(@"Note", nil)]; //You can set the subtitle too
     [self.noteMapView addAnnotation:annotation];
     
     MKCoordinateRegion region;
@@ -71,7 +79,28 @@
 }
 
 - (void)layoutSubviews {
-    if (![self.subviews containsObject:self.noteMapView]) [self addSubview:self.noteMapView];
+    if (![self.contentView.subviews containsObject:self.noteMapView]) [self.contentView addSubview:self.noteMapView];
+    //[self moveSubviews];
+    [super layoutSubviews];
+}
+
+- (void)moveSubviews {
+    if (self.editing && !_muchEditing) {
+        _muchEditing = YES;
+        for (UIView *aSubview in self.subviews) {
+            CGRect oldFrame = aSubview.frame;
+            oldFrame.origin.x += 35;
+            [aSubview setFrame:oldFrame];
+        }
+    }
+    else if (!self.editing && _muchEditing) {
+        _muchEditing = NO;
+        for (UIView *aSubview in self.subviews) {
+            CGRect oldFrame = aSubview.frame;
+            oldFrame.origin.x -= 35;
+            [aSubview setFrame:oldFrame];
+        }
+    }
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
