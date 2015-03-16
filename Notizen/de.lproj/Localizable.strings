@@ -1,0 +1,16 @@
+/* 
+  Localizable.strings
+  Notizen
+
+  Created by Johannes Körner on 16.03.15.
+  Copyright (c) 2015 Johannes Körner. All rights reserved.
+*/
+
+
+"Error - Please delete this"        =   "Fehler - bitte löschen";
+"Delete"                            =   "Löschen";
+"Share"                             =   "Teilen";
+"Insert"                            =   "Einfügen";
+"Do you want to leave the app?"     =   "Möchten Sie die App verlassen?";
+"Open in Apple Maps"                =   "In Apple Maps öffnen";
+"Note"                              =   "Notiz";
