@@ -3,17 +3,17 @@
     {
       "idiom" : "universal",
       "scale" : "1x",
-      "filename" : "GradientBackground-1.png"
+      "filename" : "Logo-NoBackground.png"
     },
     {
       "idiom" : "universal",
       "scale" : "2x",
-      "filename" : "GradientBackground.png"
+      "filename" : "Logo-NoBackground@2x.png"
     },
     {
       "idiom" : "universal",
       "scale" : "3x",
-      "filename" : "GradientBackground-2.png"
+      "filename" : "Logo-NoBackground@3x.png"
     }
   ],
   "info" : {

@@ -28,6 +28,9 @@
 
 - (void)handleAppearance {
     setBackgroundForView(self.navigationController.view);
+    UIImageView *background = [self.navigationController.view.subviews objectAtIndex:0];
+    [background setFrame:CGRectMake(0, 0, self.navigationController.view.frame.size.width, self.navigationController.view.frame.size.height)];
+    [background setContentMode:UIViewContentModeScaleAspectFill];
     [self.view setBackgroundColor:[UIColor clearColor]];
     [self.tableView setBackgroundColor:[UIColor clearColor]];
     UIView *clearView = [[UIView alloc] initWithFrame:CGRectNull];
@@ -102,6 +105,7 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
     if (self.fetchedResultsController.fetchedObjects.count == 0) {
         [self insertNewObject:nil];
     }
