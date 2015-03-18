@@ -109,6 +109,13 @@
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(dismissNewObjectStuffAndMoveToObject:)];
     self.navigationItem.rightBarButtonItems = @[];
     
+    myLabel = [[UILabel alloc] initWithFrame:CGRectMake(5, -70, self.view.frame.size.width-80, 40)];
+    [myLabel setTextColor:[UIColor whiteColor]];
+    [myLabel setFont:customTableFontOfSize(40)];
+    [myLabel setText:NSLocalizedString(@"New Folder", nil)];
+    [myLabel setTextAlignment:NSTextAlignmentCenter];
+    [self.tableView.superview addSubview:myLabel];
+    
     myTextField = [[UITextField alloc] initWithFrame:CGRectMake(5, -50, self.view.frame.size.width-80, 60)];
     [myTextField setTextColor:[UIColor whiteColor]];
     [myTextField setFont:customTableFontOfSize(30)];
@@ -129,6 +136,7 @@
         CGFloat height = self.tableView.frame.size.height;
         [self.tableView setFrame:CGRectMake(0, self.view.frame.size.height, width, height)];
         
+        [myLabel setFrame:CGRectMake(5, 64, self.view.frame.size.width-10, (self.view.frame.size.height-64-250)/2-30)];
         [myTextField setFrame:CGRectMake(5, 64 + (self.view.frame.size.height-64-250)/2-30, self.view.frame.size.width-80, 60)];
     } completion:^(BOOL finished) {
         [myTextField becomeFirstResponder];
@@ -171,7 +179,6 @@
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"NoteContainer" inManagedObjectContext:context];
     NoteContainer *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
     [newManagedObject setTitle:theTitle];
-    [context save:nil];
     
 //    ContainerViewController *controller = (ContainerViewController *)[[[UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]] instantiateViewControllerWithIdentifier:@"Detail"] topViewController];
 //    [controller setContainer:(NoteContainer *)newManagedObject];
@@ -181,6 +188,7 @@
 //    controller.navigationItem.leftItemsSupplementBackButton = YES;
 //    [self.navigationController pushViewController:controller animated:YES];
     
+    [context save:nil];
     [self dismissNewObjectStuffAndMoveToObject:newManagedObject];
 }
 
@@ -192,6 +200,9 @@
         CGFloat height = self.tableView.frame.size.height;
         
         [self.tableView setFrame:CGRectMake(0, 0, width, height)];
+        CGRect frame = myLabel.frame;
+        frame.origin.x = self.view.frame.size.width;
+        [myLabel setFrame:frame];
         [myTextField setFrame:CGRectMake(self.view.frame.size.width, 64 + (self.view.frame.size.height-64-250)/2-30, self.view.frame.size.width-80, 60)];
         [acceptButton setFrame:CGRectMake(self.view.frame.size.width+self.view.frame.size.width-80+5, 64 + (self.view.frame.size.height-64-250)/2-30, 60, 60)];
     } completion:^(BOOL finished) {
@@ -199,12 +210,12 @@
         myTextField = nil;
         [acceptButton removeFromSuperview];
         acceptButton = nil;
+        [myLabel removeFromSuperview];
+        myLabel = nil;
     }];
     
     if (object) {
-//        NSIndexPath *indexPath = [self.fetchedResultsController indexPathForObject:object];
-//        [self.tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
-//        [self tableView:self.tableView didSelectRowAtIndexPath:indexPath];
+        //tempIndexPath = [self.fetchedResultsController indexPathForObject:object];
     }
     
     [self resetBarButtonItems];
@@ -400,6 +411,7 @@
     switch(type) {
         case NSFetchedResultsChangeInsert:
             [tableView insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+            tempIndexPath = newIndexPath;
             break;
             
         case NSFetchedResultsChangeDelete:
@@ -420,6 +432,11 @@
 - (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
 {
     [self.tableView endUpdates];
+    if (tempIndexPath) {
+        [self.tableView selectRowAtIndexPath:tempIndexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
+        [self performSegueWithIdentifier:@"showDetail" sender:self];
+        tempIndexPath = nil;
+    }
 }
 
 /*

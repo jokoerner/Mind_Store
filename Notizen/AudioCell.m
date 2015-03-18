@@ -153,9 +153,15 @@
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    if (self.editing) [super setSelected:selected animated:animated];
-
-    // Configure the view for the selected state
+    if (self.editing) {
+        [super setSelected:selected animated:animated];
+        if (selected) {
+            [progressLabel setTextColor:[UIColor blackColor]];
+        }
+        else {
+            [progressLabel setTextColor:[UIColor whiteColor]];
+        }
+    }
 }
 
 @end

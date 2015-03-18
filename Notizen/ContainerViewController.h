@@ -9,10 +9,11 @@
 #import <UIKit/UIKit.h>
 #import <CoreData/CoreData.h>
 #import <MapKit/MapKit.h>
+#import <MessageUI/MessageUI.h>
 
 @class NoteContainer, ModalTextView, ModalImageView, ModalMapView, NoteContent, Note, ContentChoiceView;
 
-@interface ContainerViewController : UITableViewController <NSFetchedResultsControllerDelegate, UITextViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIActionSheetDelegate> {
+@interface ContainerViewController : UITableViewController <NSFetchedResultsControllerDelegate, UITextViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, UINavigationControllerDelegate> {
     UITextView *editingTextView;
     ModalTextView *textView;
     ModalImageView *imageView;
@@ -31,10 +32,13 @@
     
     CLLocationManager *locationManager;
     CLLocationCoordinate2D tempCoordinate;
+    
+    NSArray *activityItems;
 }
 
 @property (nonatomic, strong) NoteContainer *container;
 @property (strong, nonatomic) NSFetchedResultsController *fetchedResultsController;
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic) int pending;
 
 @end

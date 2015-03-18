@@ -17,8 +17,11 @@
     UIImageView *midImageview;
     UIImageView *botImageview;
     
+    UILabel *myLabel;
     UITextField *myTextField;
     UIButton *acceptButton;
+    
+    NSIndexPath *tempIndexPath;
 }
 
 @property (strong, nonatomic) ContainerViewController *detailViewController;

@@ -19,6 +19,8 @@
 #import "ModalMapView.h"
 #import "ContentChoiceView.h"
 #import "Note.h"
+#import <AddressBookUI/AddressBookUI.h>
+#import <MessageUI/MessageUI.h>
 
 @interface ContainerViewController ()
 
@@ -308,7 +310,7 @@
         CGFloat height = [self tableView:tableView heightForRowAtIndexPath:indexPath];
         [cell.noteImageView setFrame:CGRectMake(10, 0, self.view.frame.size.width-20, height)];
         
-        [cell setMuchEditing:self.editing];
+        //[cell setMuchEditing:self.editing];
         [self handleCellAppearance:cell];
         return cell;
     }
@@ -319,7 +321,7 @@
         AudioCell *cell = [tableView dequeueReusableCellWithIdentifier:@"AudioCell" forIndexPath:indexPath];
         [cell initWithAudioData:object.data];
         
-        [cell setMuchEditing:self.editing];
+        //[cell setMuchEditing:self.editing];
         [self handleCellAppearance:cell];
         return cell;
     }
@@ -332,7 +334,7 @@
         [data getBytes:&coordinate length:sizeof(coordinate)];
         [cell addAnnotationForCoordinate:coordinate];
         
-        [cell setMuchEditing:self.editing];
+        //[cell setMuchEditing:self.editing];
         [self handleCellAppearance:cell];
         return cell;
     }
@@ -424,7 +426,50 @@
     
     UITableViewRowAction *action2 = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:NSLocalizedString(@"Share", nil) handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
         // TODO: Share
+        NoteContent *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
+        UIActivityViewController *activity;
+        
+        if ([object.dataType isEqualToString:@"text"]) {
+            NSString *content = [[NSString alloc] initWithData:object.data encoding:NSUTF8StringEncoding];
+            activity = [[UIActivityViewController alloc] initWithActivityItems:@[content] applicationActivities:nil];
+        }
+        else if ([object.dataType isEqualToString:@"image"]) {
+            UIImage *content = [UIImage imageWithData:object.data];
+            activity = [[UIActivityViewController alloc] initWithActivityItems:@[content] applicationActivities:nil];
+        }
+        else if ([object.dataType isEqualToString:@"location"]) {
+            CLLocationCoordinate2D coordinate;
+            [object.data getBytes:&coordinate length:sizeof(coordinate)];
+            
+            CLGeocoder *coder = [[CLGeocoder alloc] init];
+            CLLocation *theLocation = [[CLLocation alloc] initWithCoordinate:coordinate altitude:1 horizontalAccuracy:1 verticalAccuracy:-1 timestamp:object.timeStamp];
+            
+            [coder reverseGeocodeLocation:theLocation completionHandler:^(NSArray *placemarks, NSError *error) {
+                CLPlacemark *placemark = [placemarks objectAtIndex:0];
+                NSString *addressName = ABCreateStringWithAddressDictionary(placemark.addressDictionary, YES);
+                NSString *content = addressName;
+                UIActivityViewController *activity2 = [[UIActivityViewController alloc] initWithActivityItems:@[content] applicationActivities:nil];
+                [self.navigationController presentViewController:activity2 animated:YES completion:nil];
+            }];
+            return;
+        }
+        else if ([object.dataType isEqualToString:@"audio"]) {
+            NSDateFormatter *df = [[NSDateFormatter alloc] init];
+            [df setTimeStyle:NSDateFormatterNoStyle];
+            [df setDateStyle:NSDateFormatterShortStyle];
+            NSString *theString = [[[df stringFromDate:object.timeStamp] stringByReplacingOccurrencesOfString:@"/" withString:@":"] stringByAppendingString:@".caf"];
+            
+            NSString *file = [NSTemporaryDirectory() stringByAppendingPathComponent:theString];
+            [object.data writeToFile:file atomically:YES];
+            NSURL *url = [NSURL fileURLWithPath:file];
+            activity = [[UIActivityViewController alloc] initWithActivityItems:@[url] applicationActivities:nil];
+        }
+        
+        [self.navigationController presentViewController:activity animated:YES completion:^{
+            [self setEditing:NO animated:YES];
+        }];
     }];
+    [action2 setBackgroundColor:[UIColor greenColor]];
     
     UITableViewRowAction *action3 = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:NSLocalizedString(@"Insert", nil) handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
         [self insertItemAfterIndexPath:indexPath];
@@ -435,8 +480,19 @@
     return @[action1, action3, action2];
 }
 
+- (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
+    [controller dismissViewControllerAnimated:YES completion:nil];
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.editing) {
+//        NoteContent *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
+//        if ([object.dataType isEqualToString:@"audio"]) {
+//            [tableView deselectRowAtIndexPath:indexPath animated:NO];
+//            return;
+//        }
+        
+        [self showEditToolbar];
         return;
     }
     
@@ -616,23 +672,29 @@
 }
 
 - (void)dismissTextView:(UIBarButtonItem *)item {
-    if (editingObject) {
-        NoteContent *object = editingObject;
-        [object setData:[textView.textView.text dataUsingEncoding:NSUTF8StringEncoding]];
-        [self.managedObjectContext save:nil];
-        editNote = editingObject.note;
+    if (textView.textView.text.length < 1) {
         editingObject = nil;
+        sequence = NO;
     }
     else {
-        //Neue Text-Notiz erstellen
-        NoteContent *newContent = [self neuerNoteContentInNote:editNote];
-        [newContent setDataType:@"text"];
-        editNote = newContent.note;
-        
-        NSData* data = [textView.textView.text dataUsingEncoding:NSUTF8StringEncoding];
-        [newContent setData:data];
-        
-        [self.managedObjectContext save:nil];
+        if (editingObject) {
+            NoteContent *object = editingObject;
+            [object setData:[textView.textView.text dataUsingEncoding:NSUTF8StringEncoding]];
+            [self.managedObjectContext save:nil];
+            editNote = editingObject.note;
+            editingObject = nil;
+        }
+        else {
+            //Neue Text-Notiz erstellen
+            NoteContent *newContent = [self neuerNoteContentInNote:editNote];
+            [newContent setDataType:@"text"];
+            editNote = newContent.note;
+            
+            NSData* data = [textView.textView.text dataUsingEncoding:NSUTF8StringEncoding];
+            [newContent setData:data];
+            
+            [self.managedObjectContext save:nil];
+        }
     }
     
     if (item) {
@@ -785,7 +847,7 @@
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     [super setEditing:editing animated:animated];
     if (editing) {
-        [self showEditToolbar];
+        
     }
     else {
         [self dismissEditToolbar];
@@ -872,7 +934,76 @@
 }
 
 - (void)shareSelectedItems:(UIBarButtonItem *)item {
+    NSArray *selected = self.tableView.indexPathsForSelectedRows;
     
+    NSMutableArray *collectedObjects = [NSMutableArray array];
+    
+    //Content-Objekte sammeln
+    for (NSIndexPath *indexPath in selected) {
+        NoteContent *aContentObject = [self.fetchedResultsController objectAtIndexPath:indexPath];
+        [collectedObjects addObject:aContentObject];
+    }
+    
+    NSMutableArray *idObjects = [NSMutableArray array];
+    
+    for (NoteContent *object in collectedObjects) {
+        if ([object.dataType isEqualToString:@"text"]) {
+            NSString *content = [[[NSString alloc] initWithData:object.data encoding:NSUTF8StringEncoding] stringByAppendingString:@"\n"];
+            [idObjects addObject:content];
+        }
+        else if ([object.dataType isEqualToString:@"image"]) {
+            UIImage *content = [UIImage imageWithData:object.data];
+            [idObjects addObject:content];
+        }
+        else if ([object.dataType isEqualToString:@"location"]) {
+            CLLocationCoordinate2D coordinate;
+            [object.data getBytes:&coordinate length:sizeof(coordinate)];
+            
+            CLGeocoder *coder = [[CLGeocoder alloc] init];
+            CLLocation *theLocation = [[CLLocation alloc] initWithCoordinate:coordinate altitude:1 horizontalAccuracy:1 verticalAccuracy:-1 timestamp:object.timeStamp];
+            
+            self.pending++;
+            [coder reverseGeocodeLocation:theLocation completionHandler:^(NSArray *placemarks, NSError *error) {
+                CLPlacemark *placemark = [placemarks objectAtIndex:0];
+                NSString *addressName = ABCreateStringWithAddressDictionary(placemark.addressDictionary, YES);
+                NSString *content = [addressName stringByAppendingString:@"\n"];
+                [idObjects addObject:content];
+                self.pending--;
+            }];
+        }
+        else if ([object.dataType isEqualToString:@"audio"]) {
+            NSDateFormatter *df = [[NSDateFormatter alloc] init];
+            [df setTimeStyle:NSDateFormatterNoStyle];
+            [df setDateStyle:NSDateFormatterShortStyle];
+            NSString *theString = [[[df stringFromDate:object.timeStamp] stringByReplacingOccurrencesOfString:@"/" withString:@":"] stringByAppendingString:@".caf"];
+            
+            NSString *file = [NSTemporaryDirectory() stringByAppendingPathComponent:theString];
+            [object.data writeToFile:file atomically:YES];
+            NSURL *url = [NSURL fileURLWithPath:file];
+            [idObjects addObject:url];
+        }
+    }
+    
+    if (self.pending > 0) {
+        [self addObserver:self forKeyPath:@"pending" options:0 context:nil];
+        activityItems = idObjects;
+    }
+    else {
+        UIActivityViewController *activity = [[UIActivityViewController alloc] initWithActivityItems:idObjects applicationActivities:nil];
+        [self.navigationController presentViewController:activity animated:YES completion:nil];
+    }
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if (object == self && [keyPath isEqualToString:@"pending"]) {
+        if (self.pending == 0) {
+            UIActivityViewController *activity = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
+            [self.navigationController presentViewController:activity animated:YES completion:nil];
+            activityItems = nil;
+            [self removeObserver:self forKeyPath:@"pending"];
+        }
+    }
 }
 
 #pragma mark - Rotation
