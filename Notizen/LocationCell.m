@@ -28,7 +28,7 @@
 //    }
     
     myManager = [[CLLocationManager alloc] init];
-    [myManager requestWhenInUseAuthorization];
+    [myManager requestAlwaysAuthorization];
     
     UIButton *accessoryButton = [[StoreHandler shared] newAddStuffButton];
     [accessoryButton addTarget:self action:@selector(accessoryButtonAction:) forControlEvents:UIControlEventTouchUpInside];

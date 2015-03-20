@@ -7,6 +7,7 @@
 */
 
 
-"CFBundleName"          =   "Denkarium";
-"CFBundleDisplayName"   =   "Denkarium";
+"CFBundleName"          =   "Keep It";
+"CFBundleDisplayName"   =   "Keep It";
 "NSLocationWhenInUseUsageDescription" = "Sie können Orte zu Notizen hinzufügen.";
+"NSLocationAlwaysUsageDescription" = "Sie können Orte zu Notizen hinzufügen.";

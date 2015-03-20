@@ -21,6 +21,8 @@
 #import "Note.h"
 #import <AddressBookUI/AddressBookUI.h>
 #import <MessageUI/MessageUI.h>
+#import "MoveViewController.h"
+#import "RotationController.h"
 
 @interface ContainerViewController ()
 
@@ -213,7 +215,7 @@
 - (void)location:(NSNotification *)notification {
     if (!locationManager) {
         locationManager = [[CLLocationManager alloc] init];
-        [locationManager requestWhenInUseAuthorization];
+        [locationManager requestAlwaysAuthorization];
     }
     CLLocationCoordinate2D coordinate = locationManager.location.coordinate;
     NSData *data = [NSData dataWithBytes:&coordinate length:sizeof(coordinate)];
@@ -859,9 +861,11 @@
     
     UIBarButtonItem *delete = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteSelectedItems:)];
     UIBarButtonItem *share = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareSelectedItems:)];
+    UIBarButtonItem *move = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemOrganize target:self action:@selector(moveSelectedItems:)];
+    UIBarButtonItem *merge = [[UIBarButtonItem alloc] initWithTitle:@"▶︎⊕◀︎" style:UIBarButtonItemStylePlain target:self action:@selector(mergeSelectedItems:)];
     
     UIBarButtonItem *flex = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    [theToolbar setItems:@[flex, share, flex, delete, flex]];
+    [theToolbar setItems:@[move, flex, merge, flex, share, flex, delete]];
     
     [theToolbar.layer setMasksToBounds:YES];
     [theToolbar.layer setCornerRadius:5.0];
@@ -992,6 +996,63 @@
         UIActivityViewController *activity = [[UIActivityViewController alloc] initWithActivityItems:idObjects applicationActivities:nil];
         [self.navigationController presentViewController:activity animated:YES completion:nil];
     }
+}
+
+- (void)moveSelectedItems:(UIBarButtonItem *)item {
+    NSMutableArray *noteContents = [NSMutableArray array];
+    NSArray *noteContentIndexPaths = [self.tableView indexPathsForSelectedRows];
+    
+    for (NSIndexPath *indexPath in noteContentIndexPaths) {
+        NoteContent *noteContent = (NoteContent *)[self.fetchedResultsController objectAtIndexPath:indexPath];
+        [noteContents addObject:noteContent];
+    }
+    
+    MoveViewController *vc = [[MoveViewController alloc] initWithStyle:UITableViewStylePlain];
+    [vc setNoteContents:noteContents];
+    [vc setManagedObjectContext:self.managedObjectContext];
+    RotationController *rotation = [[RotationController alloc] initWithRootViewController:vc];
+    [self.navigationController presentViewController:rotation animated:YES completion:nil];
+}
+
+- (void)mergeSelectedItems:(UIBarButtonItem *)item {
+    NSMutableArray *notes = [NSMutableArray array];
+    NSArray *noteContentIndexPaths = [self.tableView indexPathsForSelectedRows];
+    
+    //Note-Objekte finden
+    for (NSIndexPath *indexPath in noteContentIndexPaths) {
+        Note *note = [(NoteContent *)[self.fetchedResultsController objectAtIndexPath:indexPath] note];
+        if (![notes containsObject:note]) {
+            [notes addObject:note];
+        }
+    }
+    
+    //Nichts zu mergen
+    if (notes.count < 2) return;
+    
+    //Nach Erstellungsdatum sortieren
+    NSSortDescriptor *sd = [NSSortDescriptor sortDescriptorWithKey:@"creation" ascending:YES];
+    notes = [[notes sortedArrayUsingDescriptors:@[sd]] mutableCopy];
+    
+    //Mergen
+    for (NSUInteger i = notes.count-1; i > 0; i--) {
+        Note *note = [notes objectAtIndex:i];
+        Note *bigPoppa = [notes objectAtIndex:i-1];
+        NSSortDescriptor *sd2 = [NSSortDescriptor sortDescriptorWithKey:@"index" ascending:YES];
+        NSArray *noteContents = [note.noteContents.allObjects sortedArrayUsingDescriptors:@[sd2]];
+        NSUInteger bigPoppaCount = bigPoppa.noteContents.count;
+        for (NoteContent *content in noteContents) {
+            content.index = @(content.index.integerValue + bigPoppaCount); //neue Objekte nach alten Objekten
+            [note removeNoteContentsObject:content];
+            [content setNote:bigPoppa];
+        }
+        [notes removeObject:note];
+        [self.managedObjectContext deleteObject:note];
+    }
+    
+    for (NSIndexPath *ip in self.tableView.indexPathsForSelectedRows) {
+        [self.tableView deselectRowAtIndexPath:ip animated:YES];
+    }
+    [self.managedObjectContext save:nil];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context

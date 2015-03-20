@@ -7,6 +7,7 @@
 */
 
 
-"CFBundleName"          =   "Pensieve";
-"CFBundleDisplayName"   =   "Pensieve";
+"CFBundleName"          =   "Keep It";
+"CFBundleDisplayName"   =   "Keep It";
 "NSLocationWhenInUseUsageDescription" = "You can add locations to a note.";
+"NSLocationAlwaysUsageDescription" = "You can add locations to a note.";

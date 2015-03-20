@@ -29,4 +29,6 @@
 - (void)addNoteContents:(NSSet *)values;
 - (void)removeNoteContents:(NSSet *)values;
 
+- (Note *)exactCopy;
+
 @end

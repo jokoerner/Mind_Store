@@ -1,0 +1,15 @@
+
+/* Class = "WKInterfaceLabel"; text = "... places nearby"; ObjectID = "4CZ-6w-oVj"; */
+"4CZ-6w-oVj.text" = "... Orte in der Nähe";
+
+/* Class = "WKInterfaceLabel"; text = "Pensieve"; ObjectID = "Kjy-1v-ThG"; */
+"Kjy-1v-ThG.text" = "Keep It";
+
+/* Class = "WKInterfaceLabel"; text = "Sorry, you will have to enable location services for this app on your iPhone first."; ObjectID = "i1N-zu-KeI"; */
+"i1N-zu-KeI.text" = "Sorry, du musst zuerst Ortungsdienste für diese App freigeben.";
+
+/* Class = "WKInterfaceLabel"; text = "0"; ObjectID = "iZS-UC-wu1"; */
+"iZS-UC-wu1.text" = "0";
+
+/* Class = "WKInterfaceButton"; title = "Near Locations"; ObjectID = "yXQ-Wc-9Ay"; */
+"yXQ-Wc-9Ay.title" = "In der Nähe";

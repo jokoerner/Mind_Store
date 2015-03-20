@@ -8,8 +8,19 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreData/CoreData.h>
+#import <MapKit/MapKit.h>
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate> 
+@interface AppDelegate : UIResponder <UIApplicationDelegate, CLLocationManagerDelegate> {
+    CLLocationManager *locationManager;
+    UIBackgroundTaskIdentifier backgroundID;
+    NSMutableDictionary *replyDictionary;
+    void (^theReply)(NSDictionary *);
+    
+    BOOL addToLast;
+    BOOL once;
+    BOOL showLocations;
+    NSString *theInfo;
+}
 
 @property (strong, nonatomic) UIWindow *window;
 

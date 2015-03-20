@@ -22,6 +22,219 @@
 
 @implementation AppDelegate
 
+- (void)application:(UIApplication *)application handleWatchKitExtensionRequest:(NSDictionary *)userInfo reply:(void (^)(NSDictionary *))reply {
+    
+    replyDictionary = [NSMutableDictionary dictionary];
+    
+    if ([[userInfo valueForKey:@"addToLast"] boolValue]) {
+        addToLast = YES;
+    }
+    else {
+        addToLast = NO;
+    }
+    
+    if ([[userInfo valueForKey:@"action"] isEqualToString:@"saveNote"]) {
+        //Notiz speichern
+        theInfo = [userInfo valueForKey:@"info"];
+        
+        if (theInfo.length == 0) {
+            [replyDictionary setValue:@"No Input" forKey:@"error"];
+            reply(replyDictionary);
+            return;
+        }
+        
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        // Edit the entity name as appropriate.
+        NSEntityDescription *entity = [NSEntityDescription entityForName:@"NoteContainer" inManagedObjectContext:self.managedObjectContext];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self.title LIKE %@", @" Watch"];
+        [fetchRequest setPredicate:predicate];
+        [fetchRequest setEntity:entity];
+        NSArray *results = [self.managedObjectContext executeFetchRequest:fetchRequest error:nil];
+        NoteContainer *watchContainer;
+        if (results.count == 0) {
+            //erstellen
+            watchContainer = [self newNoteContainer];
+            [watchContainer setTitle:@" Watch"];
+        }
+        else {
+            watchContainer = [results lastObject];
+        }
+        
+        Note *newNote = [self newNote];
+        [newNote setNoteContainer:watchContainer];
+        NoteContent *newContent = [self newNoteContent];
+        [newContent setNote:newNote];
+        [newContent setIndex:@(newNote.noteContents.count-1)];
+        [newContent setDataType:@"text"];
+        [newContent setData:[theInfo dataUsingEncoding:NSUTF8StringEncoding]];
+        
+        theInfo = nil;
+        [self.managedObjectContext save:nil];
+        
+        [replyDictionary setValue:@"NO" forKey:@"error"];
+        reply(replyDictionary);
+        return;
+    }
+    
+    if ([CLLocationManager authorizationStatus] != kCLAuthorizationStatusAuthorizedAlways) {
+        [replyDictionary setValue:@"LocationServicesError" forKey:@"error"];
+        reply(replyDictionary);
+        return;
+    }
+    
+    backgroundID = [application beginBackgroundTaskWithName:@"getLocation" expirationHandler:^{
+        
+    }];
+    
+    once = NO;
+    theReply = reply;
+    
+    locationManager = [[CLLocationManager alloc] init];
+    locationManager.delegate = self;
+    locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    locationManager.pausesLocationUpdatesAutomatically = YES;
+    [locationManager startUpdatingLocation];
+    
+    if ([[userInfo valueForKey:@"action"] isEqualToString:@"saveLocation"]) {
+        //Ort speichern
+        theInfo = [userInfo valueForKey:@"info"];
+        showLocations = NO;
+    }
+    else if ([[userInfo valueForKey:@"action"] isEqualToString:@"showLocations"]) {
+        //Orte und aktuellen Standort senden
+        showLocations = YES;
+    }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateToLocation:(CLLocation *)newLocation fromLocation:(CLLocation *)oldLocation
+{
+    [locationManager stopUpdatingLocation];
+    if (once) {
+        return;
+    }
+    once = YES;
+    
+    CLLocation *currentLocation = newLocation;
+    CLLocationCoordinate2D currentCoordinate = currentLocation.coordinate;
+    NSData *data = [NSData dataWithBytes:&currentCoordinate length:sizeof(currentCoordinate)];
+    
+    //NSLog(@"Current Location: %.0f %.0f", currentCoordinate.latitude, currentCoordinate.longitude);
+    
+    if (showLocations) { //aktuelle Position und Orte im Umkreis von 500 Metern geben
+        [replyDictionary setValue:data forKey:@"currentLocation"];
+        
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        // Edit the entity name as appropriate.
+        NSEntityDescription *entity = [NSEntityDescription entityForName:@"NoteContent" inManagedObjectContext:self.managedObjectContext];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"dataType LIKE %@", @"location"];
+        [fetchRequest setPredicate:predicate];
+        [fetchRequest setEntity:entity];
+        
+        NSMutableArray *filtered = [NSMutableArray array];
+        NSArray *results = [self.managedObjectContext executeFetchRequest:fetchRequest error:nil];
+        for (int i = 1; i <= results.count; i++) {
+            NoteContent *content = [results objectAtIndex:i-1];
+            NSData *data = content.data;
+            CLLocationCoordinate2D coordinate;
+            [data getBytes:&coordinate length:sizeof(coordinate)];
+            CLLocation *aLocation = [[CLLocation alloc] initWithCoordinate:coordinate altitude:1 horizontalAccuracy:1 verticalAccuracy:-1 timestamp:content.timeStamp];
+            if ([aLocation distanceFromLocation:currentLocation] <= 500) {
+                //im Umkreis
+                [filtered addObject:data];
+            }
+        }
+        
+        [replyDictionary setValue:filtered forKey:@"locations"];
+    }
+    else { //aktuelle Position speichern
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+        // Edit the entity name as appropriate.
+        NSEntityDescription *entity = [NSEntityDescription entityForName:@"NoteContainer" inManagedObjectContext:self.managedObjectContext];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self.title LIKE %@", @" Watch"];
+        [fetchRequest setPredicate:predicate];
+        [fetchRequest setEntity:entity];
+        NSArray *results = [self.managedObjectContext executeFetchRequest:fetchRequest error:nil];
+        NoteContainer *watchContainer;
+        if (results.count == 0) {
+            //erstellen
+            watchContainer = [self newNoteContainer];
+            [watchContainer setTitle:@" Watch"];
+        }
+        else {
+            watchContainer = [results lastObject];
+        }
+        Note *newNote = [self newNote];
+        [newNote setNoteContainer:watchContainer];
+        NoteContent *newContent = [self newNoteContent];
+        [newContent setNote:newNote];
+        [newContent setIndex:@(newNote.noteContents.count-1)];
+        [newContent setDataType:@"location"];
+        [newContent setData:data];
+        
+        if (theInfo.length > 0) {
+            [newContent setIndex:@(newContent.index.integerValue+1)]; //Location nach Text zeigen
+            newContent = [self newNoteContent];
+            [newContent setNote:newNote];
+            [newContent setIndex:@(newNote.noteContents.count-1)];
+            [newContent setDataType:@"text"];
+            [newContent setData:[theInfo dataUsingEncoding:NSUTF8StringEncoding]];
+        }
+        
+        [[self managedObjectContext] save:nil];
+    }
+    theInfo = nil;
+    [replyDictionary setValue:@"NO" forKey:@"error"];
+    theReply(replyDictionary);
+    [[UIApplication sharedApplication] endBackgroundTask:backgroundID];
+}
+
+- (NoteContainer *)newNoteContainer {
+    NSManagedObjectContext *context = self.managedObjectContext;
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"NoteContainer" inManagedObjectContext:context];
+    NoteContainer *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+    return newManagedObject;
+}
+
+- (Note *)newNote {
+    NSManagedObjectContext *context = self.managedObjectContext;
+    
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+    // Edit the entity name as appropriate.
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Note" inManagedObjectContext:self.managedObjectContext];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"noteContainer.title LIKE %@", @" Watch"];
+    [fetchRequest setPredicate:predicate];
+    [fetchRequest setEntity:entity];
+    NSArray *results = [self.managedObjectContext executeFetchRequest:fetchRequest error:nil];
+    for (Note *note in results) {
+        if ([[NSDate date] timeIntervalSinceDate:note.creation] < 4) {
+            //alte Note zurückgeben
+            return note;
+        }
+    }
+    
+    if (addToLast && results.count > 0) {
+        NSSortDescriptor *sd = [NSSortDescriptor sortDescriptorWithKey:@"creation" ascending:YES];
+        results = [results sortedArrayUsingDescriptors:@[sd]];
+        return (Note *)[results lastObject];
+    }
+    
+    entity = [NSEntityDescription entityForName:@"Note" inManagedObjectContext:context];
+    Note *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+    return newManagedObject;
+}
+
+- (NoteContent *)newNoteContent {
+    NSManagedObjectContext *context = self.managedObjectContext;
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"NoteContent" inManagedObjectContext:context];
+    NoteContent *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:context];
+    return newManagedObject;
+}
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error {
+    theReply(replyDictionary);
+    [[UIApplication sharedApplication] endBackgroundTask:backgroundID];
+}
+
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.

@@ -47,6 +47,13 @@
     return [NSString stringWithFormat:@"%@%ld%@", self.noteContainer.title, (long)array.count, add];
 }
 
+- (Note *)exactCopy {
+    NSEntityDescription *entity = [NSEntityDescription entityForName:@"Note" inManagedObjectContext:self.managedObjectContext];
+    Note *newManagedObject = [NSEntityDescription insertNewObjectForEntityForName:[entity name] inManagedObjectContext:self.managedObjectContext];
+    [newManagedObject setCreation:self.creation];
+    return newManagedObject;
+}
+
 @dynamic creation;
 @dynamic timeStamp;
 @dynamic noteContainer;

@@ -10,12 +10,23 @@
             <objects>
                 <controller id="AgC-eL-Hgc" customClass="InterfaceController">
                     <items>
-                        <button width="0.5" height="0.46000000000000002" alignment="center" backgroundImage="Location" id="Ip2-kJ-SBZ">
-                            <connections>
-                                <action selector="markLocation:" destination="AgC-eL-Hgc" id="Wot-Jt-qra"/>
-                            </connections>
-                        </button>
                         <separator alignment="left" verticalAlignment="center" id="FW5-Wr-gFz"/>
+                        <group width="1" height="100" alignment="left" id="lUa-Sf-53a">
+                            <items>
+                                <button alignment="left" verticalAlignment="center" backgroundImage="Location" id="5d4-xX-1GB">
+                                    <connections>
+                                        <action selector="markLocation:" destination="AgC-eL-Hgc" id="Hfz-6G-S2D"/>
+                                    </connections>
+                                </button>
+                                <button alignment="right" verticalAlignment="center" backgroundImage="Compose" id="55n-Xk-y2t">
+                                    <connections>
+                                        <action selector="writeNote:" destination="AgC-eL-Hgc" id="1HY-jP-Pen"/>
+                                    </connections>
+                                </button>
+                            </items>
+                            <variation key="device=watch38mm" height="70"/>
+                            <variation key="device=watch42mm" height="80"/>
+                        </group>
                         <button width="1" height="0.5" alignment="center" verticalAlignment="bottom" title="Near Locations" id="yXQ-Wc-9Ay">
                             <fontDescription key="font" type="system" pointSize="18"/>
                             <connections>
@@ -24,11 +35,26 @@
                         </button>
                     </items>
                     <connections>
-                        <outlet property="markLocationButton" destination="Ip2-kJ-SBZ" id="1LI-hD-SMG"/>
+                        <outlet property="markLocationButton" destination="5d4-xX-1GB" id="i1U-LM-FRZ"/>
+                        <outlet property="separator" destination="FW5-Wr-gFz" id="jvO-dc-VVc"/>
+                        <outlet property="writeNoteButton" destination="55n-Xk-y2t" id="4Pw-CL-POS"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="164" y="222"/>
+            <point key="canvasLocation" x="163" y="206"/>
+        </scene>
+        <!--LocationServicesError-->
+        <scene sceneID="ZaY-pk-thg">
+            <objects>
+                <controller identifier="LocationServicesError" id="yrX-01-bqF">
+                    <items>
+                        <label width="1" height="1" alignment="left" text="Sorry, you will have to enable location services for this app on your iPhone first." textAlignment="left" numberOfLines="6" id="i1N-zu-KeI">
+                            <fontDescription key="font" type="system" pointSize="18"/>
+                        </label>
+                    </items>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="397" y="67.75"/>
         </scene>
         <!--Show Locations-->
         <scene sceneID="fpO-Ml-5Qq">
@@ -60,7 +86,7 @@
                             </items>
                         </group>
                         <label alignment="left" id="QeP-Ox-1j5"/>
-                        <label alignment="left" text="Pensieve" id="Kjy-1v-ThG"/>
+                        <label alignment="left" text="Keep It" id="Kjy-1v-ThG"/>
                         <label alignment="left" id="3UY-fu-8Nd"/>
                         <group alignment="left" id="eew-Gs-W6Y">
                             <items>
