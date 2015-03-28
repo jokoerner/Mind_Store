@@ -12,7 +12,7 @@
 
 @class ContainerViewController;
 
-@interface MasterViewController : UITableViewController <NSFetchedResultsControllerDelegate, UITextFieldDelegate> {
+@interface MasterViewController : UITableViewController <NSFetchedResultsControllerDelegate, UITextFieldDelegate, UISearchResultsUpdating, UISearchBarDelegate> {
     UIImageView *topImageview;
     UIImageView *midImageview;
     UIImageView *botImageview;
@@ -22,7 +22,11 @@
     UIButton *acceptButton;
     
     NSIndexPath *tempIndexPath;
+    NSIndexPath *searchIndexPath;
 }
+
+@property (nonatomic, strong) UISearchController *searchController;
+@property (nonatomic, strong) NSMutableArray *searchResults; // Filtered search results
 
 @property (strong, nonatomic) ContainerViewController *detailViewController;
 

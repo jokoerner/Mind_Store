@@ -114,6 +114,10 @@
     if (self.fetchedResultsController.fetchedObjects.count == 0) {
         [self insertNewObject:nil];
     }
+    else if (self.searchIndexPath) {
+        [self.tableView scrollToRowAtIndexPath:self.searchIndexPath atScrollPosition:UITableViewScrollPositionTop animated:YES];
+        self.searchIndexPath = nil;
+    }
 }
 
 - (void)didReceiveMemoryWarning {

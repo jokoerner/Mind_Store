@@ -11,6 +11,7 @@
 #import "NoteContainer.h"
 #import "Note.h"
 #import "NoteContent.h"
+#import "SearchViewController.h"
 
 #define DEGREES_TO_RADIANS(d) (d * M_PI / 180)
 
@@ -57,6 +58,36 @@
     self.detailViewController = (ContainerViewController *)[[self.splitViewController.viewControllers lastObject] topViewController];
     
     [self handleAppearance];
+    [self initSearchBar];
+    
+    self.tableView.contentOffset = CGPointMake(0, self.searchController.searchBar.frame.size.height);
+}
+
+- (void)initSearchBar {
+    // Create a mutable array to contain products for the search results table.
+    self.searchResults = [NSMutableArray array];
+    
+    // The table view controller is in a nav controller, and so the containing nav controller is the 'search results controller'
+    UINavigationController *searchResultsController = [[self storyboard] instantiateViewControllerWithIdentifier:@"searchNavCon"];
+    
+    self.searchController = [[UISearchController alloc] initWithSearchResultsController:searchResultsController];
+    
+    self.searchController.searchResultsUpdater = self;
+    
+    self.searchController.searchBar.frame = CGRectMake(self.searchController.searchBar.frame.origin.x, self.searchController.searchBar.frame.origin.y, self.searchController.searchBar.frame.size.width, 44.0);
+    
+    self.tableView.tableHeaderView = self.searchController.searchBar;
+    
+//    NSMutableArray *scopeButtonTitles = [[NSMutableArray alloc] init];
+//    [scopeButtonTitles addObject:NSLocalizedString(@"All", @"Search display controller All button.")];
+//    [scopeButtonTitles addObject:@"Test"];
+//    
+//    self.searchController.searchBar.scopeButtonTitles = scopeButtonTitles;
+    self.searchController.searchBar.delegate = self;
+    [self.searchController.searchBar setTintColor:customTintColor];
+    [self.searchController.searchBar setBarTintColor:[UIColor colorWithWhite:0.8 alpha:0.5]];
+    
+    self.definesPresentationContext = YES;
 }
 
 - (void)resetBarButtonItems {
@@ -73,6 +104,7 @@
     observe(self, @selector(dropReferencesToManagedObjects), @"dropReferencesToManagedObjects");
     observe(self, @selector(enableUserInteraction), @"enableUserInteraction");
     observe(self, @selector(disableUserInteraction), @"disableUserInteraction");
+    observe(self, @selector(selectedObjectFromSearch:), @"selectedObjectFromSearch");
     
     [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
 }
@@ -243,6 +275,10 @@
         [controller setContainer:(NoteContainer *)object];
         [controller setManagedObjectContext:self.managedObjectContext];
         [controller setTitle:[object valueForKey:@"title"]];
+        if (searchIndexPath) {
+            controller.searchIndexPath = searchIndexPath;
+            searchIndexPath = nil;
+        }
         controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
         controller.navigationItem.leftItemsSupplementBackButton = YES;
     }
@@ -467,6 +503,109 @@
 
 - (BOOL)shouldAutorotate {
     return NO;
+}
+
+#pragma mark - UISearchResultsUpdating
+
+-(void)updateSearchResultsForSearchController:(UISearchController *)searchController {
+    
+    NSString *searchString = [self.searchController.searchBar text];
+    
+//    NSString *scope = nil;
+    
+//    NSInteger selectedScopeButtonIndex = [self.searchController.searchBar selectedScopeButtonIndex];
+//    if (selectedScopeButtonIndex > 0) {
+//        scope = @"Test";
+//    }
+    
+    [self updateFilteredContentForNoteContent:searchString type:nil];
+    
+    if (self.searchController.searchResultsController) {
+        UINavigationController *navController = (UINavigationController *)self.searchController.searchResultsController;
+        
+        SearchViewController *vc = (SearchViewController *)navController.topViewController;
+        vc.searchResults = self.searchResults;
+        [vc.tableView reloadData];
+    }
+    
+}
+
+#pragma mark - Search
+
+- (void)selectedObjectFromSearch:(NSNotification *)notification {
+    //IndexPath suchen
+    NoteContainer *container = notification.object;
+    NSIndexPath *indexPath = [self.fetchedResultsController indexPathForObject:container];
+    
+    //Position der zur Suche passenden Notiz suchen
+    NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"creation.description" ascending:NO];
+    NSSortDescriptor *sortDescriptor2 = [[NSSortDescriptor alloc] initWithKey:@"index" ascending:YES];
+    NSArray *sortDescriptors = @[sortDescriptor, sortDescriptor2];
+    NSArray *noteObjekte = [container.notes.allObjects sortedArrayUsingDescriptors:sortDescriptors];
+    NSIndexPath *indexPathOfNote;
+    for (Note *note in noteObjekte) {
+        for (NoteContent *content in note.noteContents) {
+            if ([content.dataType isEqualToString:@"text"]) {
+                //Text durchsuchen
+                NSString *contentString = [[NSString alloc] initWithData:content.data encoding:NSUTF8StringEncoding];
+                NSUInteger searchOptions = NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch;
+                NSRange noteContentStringRange = NSMakeRange(0, contentString.length);
+                NSRange foundRange = [contentString rangeOfString:self.searchController.searchBar.text options:searchOptions range:noteContentStringRange];
+                if (foundRange.length > 0) {
+                    [self.searchResults addObject:container];
+                    indexPathOfNote = [NSIndexPath indexPathForRow:content.index.integerValue inSection:[noteObjekte indexOfObject:note]];
+                    
+                    //Transition
+                    [self.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+                    searchIndexPath = indexPathOfNote;
+                    [self performSegueWithIdentifier:@"showDetail" sender:self];
+                    [self.searchController setActive:NO];
+                }
+            }
+        }
+    }
+}
+
+#pragma mark - UISearchBarDelegate
+
+// Workaround for bug: -updateSearchResultsForSearchController: is not called when scope buttons change
+- (void)searchBar:(UISearchBar *)searchBar selectedScopeButtonIndexDidChange:(NSInteger)selectedScope {
+    [self updateSearchResultsForSearchController:self.searchController];
+}
+
+
+#pragma mark - Content Filtering
+
+- (void)updateFilteredContentForNoteContent:(NSString *)noteContentString type:(NSString *)typeName {
+    // Update the filtered array based on the search text and scope.
+    if ((noteContentString == nil) || [noteContentString length] == 0) {
+        self.searchResults = [self.fetchedResultsController.fetchedObjects mutableCopy];
+        return;
+    }
+    
+    [self.searchResults removeAllObjects]; // First clear the filtered array.
+    
+    for (NoteContainer *container in self.fetchedResultsController.fetchedObjects) {
+        BOOL containerAdded = NO;
+        for (Note *note in container.notes) {
+            for (NoteContent *content in note.noteContents) {
+                if ([content.dataType isEqualToString:@"text"]) {
+                    //Text durchsuchen
+                    NSString *contentString = [[NSString alloc] initWithData:content.data encoding:NSUTF8StringEncoding];
+                    NSUInteger searchOptions = NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch;
+                    NSRange noteContentStringRange = NSMakeRange(0, contentString.length);
+                    NSRange foundRange = [contentString rangeOfString:noteContentString options:searchOptions range:noteContentStringRange];
+                    if (foundRange.length > 0) {
+                        [self.searchResults addObject:container];
+                        containerAdded = YES;
+                        break;
+                    }
+                }
+                //evtl. Datum suchen
+            }
+            if (containerAdded) break;
+        }
+    }
 }
 
 @end

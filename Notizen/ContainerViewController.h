@@ -47,5 +47,6 @@
 @property (strong, nonatomic) NSFetchedResultsController *fetchedResultsController;
 @property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 @property (nonatomic) int pending;
+@property (strong, nonatomic) NSIndexPath *searchIndexPath;
 
 @end
