@@ -19,6 +19,10 @@
     self.timeStamp = [NSDate date];
 }
 
+- (void)prepareForDeletion {
+    if (self.note) [self.note prepareForDeletionOfNoteContentObject:self];
+}
+
 - (void)willSave {
     [super willSave];
     NSString *newHash = [self calcHash];

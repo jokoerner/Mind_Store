@@ -20,6 +20,16 @@
     self.timeStamp = date;
 }
 
+- (void)prepareForDeletionOfNoteContentObject:(NoteContent *)noteContent {
+    NSArray *array = [[self.noteContents allObjects] sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"index" ascending:YES]]];
+    NSInteger index = [array indexOfObject:noteContent];
+    
+    for (NSInteger i = index+1; i < array.count; i++) {
+        NoteContent *aContentObject = [array objectAtIndex:i];
+        [aContentObject setIndex:@(i-1)];
+    }
+}
+
 - (void)willSave {
     [super willSave];
     NSString *newHash = [self calcHash];

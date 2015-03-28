@@ -3,7 +3,7 @@
 "4CZ-6w-oVj.text" = "... Orte in der Nähe";
 
 /* Class = "WKInterfaceLabel"; text = "Pensieve"; ObjectID = "Kjy-1v-ThG"; */
-"Kjy-1v-ThG.text" = "Keep It";
+"Kjy-1v-ThG.text" = "Mind Store";
 
 /* Class = "WKInterfaceLabel"; text = "Sorry, you will have to enable location services for this app on your iPhone first."; ObjectID = "i1N-zu-KeI"; */
 "i1N-zu-KeI.text" = "Sorry, du musst zuerst Ortungsdienste für diese App freigeben.";

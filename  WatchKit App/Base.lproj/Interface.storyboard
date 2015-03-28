@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="6751" systemVersion="14C1510" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="6751" systemVersion="14C1514" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="AgC-eL-Hgc">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="3737"/>
@@ -86,7 +86,7 @@
                             </items>
                         </group>
                         <label alignment="left" id="QeP-Ox-1j5"/>
-                        <label alignment="left" text="Keep It" id="Kjy-1v-ThG"/>
+                        <label alignment="left" text="Mind Store" id="Kjy-1v-ThG"/>
                         <label alignment="left" id="3UY-fu-8Nd"/>
                         <group alignment="left" id="eew-Gs-W6Y">
                             <items>

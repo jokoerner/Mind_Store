@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
-@class NoteContainer;
+@class NoteContainer, NoteContent;
 
 @interface Note : NSManagedObject
 
@@ -30,5 +30,6 @@
 - (void)removeNoteContents:(NSSet *)values;
 
 - (Note *)exactCopy;
+- (void)prepareForDeletionOfNoteContentObject:(NoteContent *)noteContent;
 
 @end

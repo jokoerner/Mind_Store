@@ -10,21 +10,26 @@
 #import <CoreData/CoreData.h>
 #import <MapKit/MapKit.h>
 #import <MessageUI/MessageUI.h>
+#import "BVReorderTableView.h"
 
 @class NoteContainer, ModalTextView, ModalImageView, ModalMapView, NoteContent, Note, ContentChoiceView;
 
-@interface ContainerViewController : UITableViewController <NSFetchedResultsControllerDelegate, UITextViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, UINavigationControllerDelegate> {
+@interface ContainerViewController : UITableViewController </*ReorderTableViewDelegate, */NSFetchedResultsControllerDelegate, UITextViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UIActionSheetDelegate, MFMailComposeViewControllerDelegate, UINavigationControllerDelegate> {
     UITextView *editingTextView;
     ModalTextView *textView;
     ModalImageView *imageView;
     ModalMapView *mapView;
     NoteContent *editingObject;
     
+    UIImagePickerController *myCameraPicker;
+    UIImagePickerController *myAlbumPicker;
+    
     Note *editNote;
     
     UIToolbar *editToolbar;
     
     NSIndexPath *tempIndexPath;
+    NSIndexPath *moveIndexPath;
     
     BOOL sequence;
     
@@ -34,6 +39,8 @@
     CLLocationCoordinate2D tempCoordinate;
     
     NSArray *activityItems;
+    
+    BOOL isDeleting;
 }
 
 @property (nonatomic, strong) NoteContainer *container;

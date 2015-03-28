@@ -92,6 +92,7 @@
     [self.navigationItem setHidesBackButton:NO animated:YES];
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
     self.navigationItem.rightBarButtonItems = @[addButton, self.editButtonItem];
+    self.navigationItem.leftBarButtonItems = @[];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -294,6 +295,13 @@
     NoteContent *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
     NSString *dataType = object.dataType;
     
+    if (moveIndexPath == indexPath) {
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ReorderCell" forIndexPath:indexPath];
+        //cell.backgroundColor = [UIColor colorWithRed:0.4 green:1.0 blue:0.4 alpha:0.15];
+        cell.backgroundColor = [UIColor clearColor];
+        return cell;
+    }
+    
     if ([dataType isEqualToString:@"text"]) {
         TextCell *cell = [tableView dequeueReusableCellWithIdentifier:@"TextCell" forIndexPath:indexPath];
         NSString *text = [[NSString alloc] initWithData:object.data encoding:NSUTF8StringEncoding];
@@ -399,6 +407,7 @@
             [context deleteObject:object.note];
         }
         else {
+            isDeleting = YES;
             [context deleteObject:object];
         }
         
@@ -427,7 +436,7 @@
     }];
     
     UITableViewRowAction *action2 = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:NSLocalizedString(@"Share", nil) handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
-        // TODO: Share
+        //Share
         NoteContent *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
         UIActivityViewController *activity;
         
@@ -471,7 +480,7 @@
             [self setEditing:NO animated:YES];
         }];
     }];
-    [action2 setBackgroundColor:[UIColor greenColor]];
+    [action2 setBackgroundColor:[UIColor grayColor]];
     
     UITableViewRowAction *action3 = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:NSLocalizedString(@"Insert", nil) handler:^(UITableViewRowAction *action, NSIndexPath *indexPath) {
         [self insertItemAfterIndexPath:indexPath];
@@ -479,7 +488,7 @@
     }];
     [action3 setBackgroundColor:[UIColor orangeColor]];
     
-    return @[action1, action3, action2];
+    return @[action1, action2, action3];
 }
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
@@ -636,13 +645,17 @@
             break;
             
         case NSFetchedResultsChangeUpdate:
-            [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            if (!isDeleting) {
+                [tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            }
             //[self configureCell:[tableView cellForRowAtIndexPath:indexPath] atIndexPath:indexPath];
             break;
             
         case NSFetchedResultsChangeMove:
-            [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-            [tableView insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+            if (!isDeleting) {
+                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+                [tableView insertRowsAtIndexPaths:@[newIndexPath] withRowAnimation:UITableViewRowAnimationFade];
+            }
             break;
     }
 }
@@ -651,7 +664,13 @@
 {
     [self.tableView endUpdates];
     
-    [self.tableView performSelector:@selector(reloadSectionIndexTitles) withObject:nil afterDelay:0.8];
+    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, 0.5 * NSEC_PER_SEC);
+    dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+        //Do something
+        isDeleting = NO;
+    });
+//    [self.tableView performSelector:@selector(beginUpdates) withObject:nil afterDelay:0.4];
+//    [self.tableView performSelector:@selector(endUpdates) withObject:nil afterDelay:0.5];
 //    [self.tableView reloadSectionIndexTitles];
 }
 
@@ -674,6 +693,13 @@
 }
 
 - (void)dismissTextView:(UIBarButtonItem *)item {
+    if (textView.textView.text.length < 1) {
+        editingObject = nil;
+        sequence = NO;
+    }
+    if ([[textView.textView.text substringFromIndex:textView.textView.text.length-1] isEqualToString:@" "]) {
+        textView.textView.text = [textView.textView.text substringToIndex:textView.textView.text.length-1];
+    }
     if (textView.textView.text.length < 1) {
         editingObject = nil;
         sequence = NO;
@@ -714,34 +740,92 @@
 
 #pragma mark - ModalImageView
 
+//- (void) navigationController: (UINavigationController *) navigationController  willShowViewController: (UIViewController *) viewController animated: (BOOL) animated {
+//    if (!myImagePicker) return;
+//    
+//    if (myImagePicker.sourceType == UIImagePickerControllerSourceTypePhotoLibrary) {
+//        UIBarButtonItem* button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(showCamera:)];
+//        viewController.navigationItem.rightBarButtonItems = [NSArray arrayWithObject:button];
+//    } else {
+////        UIBarButtonItem* button = [[UIBarButtonItem alloc] initWithTitle:@"Library" style:UIBarButtonItemStylePlain target:self action:@selector(showLibrary:)];
+////        viewController.navigationItem.leftBarButtonItems = [NSArray arrayWithObject:button];
+////        viewController.navigationItem.title = @"Take Photo";
+////        viewController.navigationController.navigationBarHidden = NO; // important
+////        viewController.navigationController.navigationBar.layer.opacity = 0.4;
+//        UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(self.view.frame.size.width/2-20, 2, 40, 40)];
+//        [button setImage:[UIImage imageNamed:@"Picture"] forState:UIControlStateNormal];
+//        [button addTarget:self action:@selector(showLibrary:) forControlEvents:UIControlEventTouchUpInside];
+//        myImagePicker.cameraOverlayView = button;
+//    }
+//}
+
+- (void)showCamera:(id)sender {
+    [myAlbumPicker dismissViewControllerAnimated:YES completion:NULL];
+}
+
+- (void)showLibrary:(id)sender {
+    if (!myAlbumPicker) {
+        myAlbumPicker = [[UIImagePickerController alloc] init];
+        myAlbumPicker.delegate = self;
+        myAlbumPicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+        myAlbumPicker.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+        //Wird nur aufgerufen nachdem die Kamera schon gezeigt wurde
+        UIBarButtonItem* button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(showCamera:)];
+        myAlbumPicker.navigationItem.rightBarButtonItems = [NSArray arrayWithObject:button];
+    }
+    if (myCameraPicker) {
+        [myCameraPicker presentViewController:myAlbumPicker animated:YES completion:NULL];
+    }
+}
+
 - (void)takePhoto:(UIButton *)sender {
-    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-    picker.delegate = self;
     if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        picker.sourceType = UIImagePickerControllerSourceTypeCamera;
-        [self.navigationController presentViewController:picker animated:YES completion:NULL];
+        myCameraPicker = [[UIImagePickerController alloc] init];
+        myCameraPicker.delegate = self;
+        myCameraPicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+        
+        UIButton *button = [[UIButton alloc] initWithFrame:CGRectMake(self.view.frame.size.width/2-20, 2, 40, 40)];
+        [button setImage:[UIImage imageNamed:@"Picture"] forState:UIControlStateNormal];
+        [button addTarget:self action:@selector(showLibrary:) forControlEvents:UIControlEventTouchUpInside];
+        myCameraPicker.cameraOverlayView = button;
+        
+        [self.navigationController presentViewController:myCameraPicker animated:YES completion:NULL];
+    }
+    else if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]){
+        myAlbumPicker = [[UIImagePickerController alloc] init];
+        myAlbumPicker.delegate = self;
+        myAlbumPicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+        [self.navigationController presentViewController:myAlbumPicker animated:YES completion:NULL];
     }
     else {
         // TODO alert, no camera available
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:nil message:NSLocalizedString(@"No camera available", nil) delegate:nil cancelButtonTitle:NSLocalizedString(@"Close", nil) otherButtonTitles:nil, nil];
+        [alert show];
     }
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     UIImage *chosenImage = info[UIImagePickerControllerOriginalImage];
+    UIImage *editedChosenImage = info[UIImagePickerControllerEditedImage];
+    UIImage *finalImage = chosenImage;
+    if (editedChosenImage) finalImage = editedChosenImage;
     if (imageView) {
-        [imageView updateImage:chosenImage];
+        [imageView updateImage:finalImage];
     }
     else {
         // Neuen Inhalt erstellen
         NoteContent *newContent = [self neuerNoteContentInNote:editNote];
         [newContent setDataType:@"image"];
         
-        NSData* data = UIImageJPEGRepresentation(chosenImage, 0.9);
+        NSData* data = UIImageJPEGRepresentation(finalImage, 0.9);
         [newContent setData:data]; //TODO? : evtl. in async Block
         
         [self.managedObjectContext save:nil];
     }
-    [picker dismissViewControllerAnimated:YES completion:NULL];
+    
+    [self dismissViewControllerAnimated:YES completion:NULL];
+    myCameraPicker = nil;
+    myAlbumPicker = nil;
 }
 
 - (void)deleteImageView:(NSNotification *)notification {
@@ -862,10 +946,10 @@
     UIBarButtonItem *delete = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteSelectedItems:)];
     UIBarButtonItem *share = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareSelectedItems:)];
     UIBarButtonItem *move = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemOrganize target:self action:@selector(moveSelectedItems:)];
-    UIBarButtonItem *merge = [[UIBarButtonItem alloc] initWithTitle:@"▶︎⊕◀︎" style:UIBarButtonItemStylePlain target:self action:@selector(mergeSelectedItems:)];
+    //UIBarButtonItem *merge = [[UIBarButtonItem alloc] initWithTitle:@"▶︎⊕◀︎" style:UIBarButtonItemStylePlain target:self action:@selector(mergeSelectedItems:)];
     
     UIBarButtonItem *flex = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    [theToolbar setItems:@[move, flex, merge, flex, share, flex, delete]];
+    [theToolbar setItems:@[move/*, flex, merge*/, flex, share, flex, delete]];
     
     [theToolbar.layer setMasksToBounds:YES];
     [theToolbar.layer setCornerRadius:5.0];
@@ -908,15 +992,19 @@
 }
 
 - (void)deleteSelectedItemsImpl {
+    isDeleting = YES;
+    
     NSArray *selected = self.tableView.indexPathsForSelectedRows;
     
     NSMutableArray *collectedObjects = [NSMutableArray array];
     NSMutableArray *collectedObjects2 = [NSMutableArray array];
+    NSMutableArray *notesToKeep = [NSMutableArray array];
     
-    //Content-Objekte sammeln
+    //Content-Objekte und Note-Objekte sammeln
     for (NSIndexPath *indexPath in selected) {
         NoteContent *aContentObject = [self.fetchedResultsController objectAtIndexPath:indexPath];
         [collectedObjects addObject:aContentObject];
+        if (![notesToKeep containsObject:aContentObject.note]) [notesToKeep addObject:aContentObject.note];
     }
     
     //Content-Objekte löschen, Note-Objekte sammeln
@@ -1122,5 +1210,74 @@
     NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
     [self insertItemAfterIndexPath:indexPath];
 }
+
+#pragma mark - BVReorderTableView
+
+// This method is called when the long press gesture is triggered starting the re-ording process.
+// You insert a blank row object into your data source and return the object you want to save for
+// later. This method is only called once.
+- (id)saveObjectAndInsertBlankRowAtIndexPath:(NSIndexPath *)indexPath {
+    moveIndexPath = indexPath;
+    return [self.fetchedResultsController objectAtIndexPath:indexPath];
+}
+
+// This method is called when the selected row is dragged to a new position. You simply update your
+// data source to reflect that the rows have switched places. This can be called multiple times
+// during the reordering process.
+- (void)moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath {
+    moveIndexPath = toIndexPath;
+//    id object = [_objects objectAtIndex:fromIndexPath.row];
+//    [_objects removeObjectAtIndex:fromIndexPath.row];
+//    [_objects insertObject:object atIndex:toIndexPath.row];
+}
+
+
+// This method is called when the selected row is released to its new position. The object is the same
+// object you returned in saveObjectAndInsertBlankRowAtIndexPath:. Simply update the data source so the
+// object is in its new position. You should do any saving/cleanup here.
+- (void)finishReorderingWithObject:(id)object atIndexPath:(NSIndexPath *)indexPath; {
+    NoteContent *movedContent = (NoteContent *)object;
+    NoteContent *currentContent = [self.fetchedResultsController objectAtIndexPath:indexPath];
+    Note *newNote = currentContent.note;
+    Note *oldNote = movedContent.note;
+    
+    //Objekt aus dem alten Note-Objekt entfernen
+    [oldNote removeNoteContentsObject:movedContent];
+    
+    //Indices updaten
+    NSSortDescriptor *sd = [NSSortDescriptor sortDescriptorWithKey:@"index" ascending:YES];
+    NSArray *oldContents = [oldNote.noteContents.allObjects sortedArrayUsingDescriptors:@[sd]];
+    for (NSInteger i = 0; i < oldContents.count; i++) {
+        NoteContent *someContent = [oldContents objectAtIndex:i];
+        [someContent setIndex:@(i)];
+    }
+    
+    //Indices der Objekte danach erhöhen
+    NSArray *newContents = [newNote.noteContents.allObjects sortedArrayUsingDescriptors:@[sd]];
+    for (NSInteger i = indexPath.row; i < newContents.count; i++) {
+        NoteContent *someContent = [newContents objectAtIndex:i];
+        [someContent setIndex:@(i+1)];
+    }
+    
+    //Index setzen
+    movedContent.index = @(indexPath.row);
+    
+    //Zu neuem Note-Objekt hinzufügen
+    [movedContent setNote:newNote];
+    
+    // do any additional cleanup here
+    moveIndexPath = nil;
+}
+
+#pragma mark - Andere
+
+- (void)updateIndicesForNote:(Note *)note {
+    NSArray *array = [[note.noteContents allObjects] sortedArrayUsingDescriptors:@[[NSSortDescriptor sortDescriptorWithKey:@"index" ascending:YES]]];
+    for (int i = 0; i < array.count; i++) {
+        NoteContent *content = [array objectAtIndex:i];
+        [content setIndex:@(i)];
+    }
+}
+
 
 @end
