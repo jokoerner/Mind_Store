@@ -501,12 +501,6 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (self.editing) {
-//        NoteContent *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
-//        if ([object.dataType isEqualToString:@"audio"]) {
-//            [tableView deselectRowAtIndexPath:indexPath animated:NO];
-//            return;
-//        }
-        
         [self showEditToolbar];
         return;
     }
@@ -514,18 +508,89 @@
     NoteContent *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
     editingObject = object;
     if ([object.dataType isEqualToString:@"text"]) {
-        TextCell *cell = (TextCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath];
-        textView = [[ModalTextView alloc] initWithText:cell.noteTextView.text];
-        [textView setOffset:64.0];
-        CGRect frame = [self.view convertRect:cell.noteTextView.frame fromView:cell];
-        [textView showFromFrame:frame onTopOfView:self.navigationController.view];
-        UIBarButtonItem *addItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNextNewItem:)];
-        UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissTextView:)];
-        UIBarButtonItem *trash = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteTextView:)];
-        [self.navigationItem setRightBarButtonItems:@[item, addItem] animated:YES];
-        [self.navigationItem setHidesBackButton:YES animated:YES];
-        [self.navigationItem setLeftBarButtonItems:@[trash] animated:YES];
-        [self.tableView setScrollEnabled:NO];
+        if (!actionDictionary) {
+            NSString *testString = [[NSString alloc] initWithData:object.data encoding:NSUTF8StringEncoding];
+            NSDataDetector *detectAddress = [[NSDataDetector alloc] initWithTypes:NSTextCheckingTypeAddress error:nil];
+            NSArray *addressMatches = [detectAddress matchesInString:testString options:0 range:NSMakeRange(0, [testString length])];
+            NSDataDetector *detectLink = [[NSDataDetector alloc] initWithTypes:NSTextCheckingTypeLink error:nil];
+            NSArray *linkMatches = [detectLink matchesInString:testString options:0 range:NSMakeRange(0, [testString length])];
+            NSDataDetector *detectPhone = [[NSDataDetector alloc] initWithTypes:NSTextCheckingTypePhoneNumber error:nil];
+            NSArray *phoneMatches = [detectPhone matchesInString:testString options:0 range:NSMakeRange(0, [testString length])];
+            //TODO alles in ActionView zeigen
+            NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+            for (NSTextCheckingResult *address in addressMatches) {
+                NSString *key = [NSString stringWithFormat:@"addr %d", (int)dic.allKeys.count];
+                NSString *addressString = [NSString stringWithFormat:@"%@+%@+%@+%@+%@+%@",
+                                           [address.addressComponents valueForKey:NSTextCheckingNameKey],
+                                           [address.addressComponents valueForKey:NSTextCheckingStreetKey],
+                                           [address.addressComponents valueForKey:NSTextCheckingZIPKey],
+                                           [address.addressComponents valueForKey:NSTextCheckingCityKey],
+                                           [address.addressComponents valueForKey:NSTextCheckingStateKey],
+                                           [address.addressComponents valueForKey:NSTextCheckingCountryKey]];
+                [dic setValue:addressString forKey:key];
+            }
+            for (NSTextCheckingResult *link in linkMatches) {
+                NSString *key = [NSString stringWithFormat:@"link %d", (int)dic.allKeys.count];
+                [dic setValue:link.URL.absoluteString forKey:key];
+            }
+            for (NSTextCheckingResult *phone in phoneMatches) {
+                NSString *key = [NSString stringWithFormat:@"call %d", (int)dic.allKeys.count];
+                [dic setValue:phone.phoneNumber forKey:key];
+            }
+            if (dic.allKeys.count == 0) {
+                actionDictionary = nil;
+                
+                TextCell *cell = (TextCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath];
+                textView = [[ModalTextView alloc] initWithText:cell.noteTextView.text];
+                [textView setOffset:64.0];
+                CGRect frame = [self.view convertRect:cell.noteTextView.frame fromView:cell];
+                [textView showFromFrame:frame onTopOfView:self.navigationController.view];
+                UIBarButtonItem *addItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNextNewItem:)];
+                UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissTextView:)];
+                UIBarButtonItem *trash = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteTextView:)];
+                [self.navigationItem setRightBarButtonItems:@[item, addItem] animated:YES];
+                [self.navigationItem setHidesBackButton:YES animated:YES];
+                [self.navigationItem setLeftBarButtonItems:@[trash] animated:YES];
+                [self.tableView setScrollEnabled:NO];
+                
+                return;
+            }
+            [dic setValue:@(indexPath.row) forKey:@"row"];
+            [dic setValue:@(indexPath.section) forKey:@"section"];
+            UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:NSLocalizedString(@"Cancel", nil) destructiveButtonTitle:NSLocalizedString(@"Edit", nil) otherButtonTitles:nil, nil];
+            [sheet setTag:3];
+            
+            NSMutableArray *optionen = [[dic.allKeys sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)] mutableCopy];
+            for (NSInteger i = optionen.count-1; i >= 0; i--) {
+                if ([[optionen objectAtIndex:i] isEqualToString:@"row"] || [[optionen objectAtIndex:i] isEqualToString:@"section"]) {
+                    [optionen removeObjectAtIndex:i];
+                }
+            }
+            
+            for (NSString *key in optionen) {
+                NSString *buttonTitle = [dic valueForKey:key];
+                [sheet addButtonWithTitle:buttonTitle];
+            }
+            
+            actionDictionary = dic;
+            [sheet showFromRect:[self.tableView cellForRowAtIndexPath:indexPath].frame inView:self.view animated:YES];
+        }
+        else {
+            actionDictionary = nil;
+            
+            TextCell *cell = (TextCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath];
+            textView = [[ModalTextView alloc] initWithText:cell.noteTextView.text];
+            [textView setOffset:64.0];
+            CGRect frame = [self.view convertRect:cell.noteTextView.frame fromView:cell];
+            [textView showFromFrame:frame onTopOfView:self.navigationController.view];
+            UIBarButtonItem *addItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNextNewItem:)];
+            UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissTextView:)];
+            UIBarButtonItem *trash = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteTextView:)];
+            [self.navigationItem setRightBarButtonItems:@[item, addItem] animated:YES];
+            [self.navigationItem setHidesBackButton:YES animated:YES];
+            [self.navigationItem setLeftBarButtonItems:@[trash] animated:YES];
+            [self.tableView setScrollEnabled:NO];
+        }
     }
     else if ([object.dataType isEqualToString:@"image"]) {
         ImageCell *cell = (ImageCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath];
@@ -929,6 +994,47 @@
         if (buttonIndex != actionSheet.cancelButtonIndex) {
             [self deleteSelectedItemsImpl];
         }
+    }
+    else if (actionSheet.tag == 3) { //Kontext-Aktion für TextViews
+        if (buttonIndex == actionSheet.cancelButtonIndex) {
+            [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+            actionDictionary = nil;
+            return;
+        }
+        
+        if (buttonIndex == actionSheet.destructiveButtonIndex) {
+            NSIndexPath *indexPath = [NSIndexPath indexPathForRow:
+                                                        [[actionDictionary valueForKey:@"row"] integerValue]
+                                                        inSection:
+                                      [[actionDictionary valueForKey:@"section"] integerValue]];
+            [self tableView:self.tableView didSelectRowAtIndexPath:indexPath];
+            return;
+        }
+        
+        NSMutableArray *optionen = [[actionDictionary.allKeys sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)] mutableCopy];
+        for (NSInteger i = optionen.count-1; i >= 0; i--) {
+            if ([[optionen objectAtIndex:i] isEqualToString:@"row"] || [[optionen objectAtIndex:i] isEqualToString:@"section"]) {
+                [optionen removeObjectAtIndex:i];
+            }
+        }
+        
+        NSString *key = [optionen objectAtIndex:buttonIndex-2];
+        if ([[key substringToIndex:4] isEqualToString:@"addr"]) {
+            NSString *addressOnMap = [actionDictionary valueForKey:key];
+            NSString* addr = [NSString stringWithFormat:@"http://maps.apple.com/?q=%@",addressOnMap];
+            NSURL* url = [[NSURL alloc] initWithString:[addr stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+            [[UIApplication sharedApplication] openURL:url];
+        }
+        else if ([[key substringToIndex:4] isEqualToString:@"link"]) {
+            NSURL* url = [[NSURL alloc] initWithString:[actionDictionary valueForKey:key]];
+            [[UIApplication sharedApplication] openURL:url];
+        }
+        else if ([[key substringToIndex:4] isEqualToString:@"call"]) {
+            NSString *urlString = [NSString stringWithFormat:@"tel:%@", [actionDictionary valueForKey:key]];
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
+        }
+        
+        [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
     }
 }
 

@@ -41,6 +41,8 @@
     NSArray *activityItems;
     
     BOOL isDeleting;
+    
+    NSMutableDictionary *actionDictionary;
 }
 
 @property (nonatomic, strong) NoteContainer *container;

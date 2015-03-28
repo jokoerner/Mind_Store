@@ -36,11 +36,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Notizen/ContainerViewController.m"
-            timestampString = "449271178.208715"
+            timestampString = "449276874.309867"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "532"
-            endingLineNumber = "532"
+            startingLineNumber = "597"
+            endingLineNumber = "597"
             landmarkName = "-tableView:didSelectRowAtIndexPath:"
             landmarkType = "5">
          </BreakpointContent>
@@ -84,11 +84,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Notizen/ContainerViewController.m"
-            timestampString = "449271178.208715"
+            timestampString = "449276874.309867"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "959"
-            endingLineNumber = "959"
+            startingLineNumber = "1065"
+            endingLineNumber = "1065"
             landmarkName = "-editToolbar"
             landmarkType = "5">
          </BreakpointContent>
@@ -462,11 +462,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Notizen/ContainerViewController.m"
-            timestampString = "449271178.208715"
+            timestampString = "449276874.309867"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "834"
-            endingLineNumber = "834"
+            startingLineNumber = "899"
+            endingLineNumber = "899"
             landmarkName = "-deleteImageView:"
             landmarkType = "5">
          </BreakpointContent>
@@ -478,11 +478,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Notizen/ContainerViewController.m"
-            timestampString = "449271178.208715"
+            timestampString = "449276874.309867"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "849"
-            endingLineNumber = "849"
+            startingLineNumber = "914"
+            endingLineNumber = "914"
             landmarkName = "-dismissImageView:"
             landmarkType = "5">
          </BreakpointContent>
@@ -494,11 +494,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Notizen/ContainerViewController.m"
-            timestampString = "449271178.208715"
+            timestampString = "449276874.309867"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "850"
-            endingLineNumber = "850"
+            startingLineNumber = "915"
+            endingLineNumber = "915"
             landmarkName = "-dismissImageView:"
             landmarkType = "5">
          </BreakpointContent>
@@ -574,11 +574,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Notizen/ContainerViewController.m"
-            timestampString = "449271178.208715"
+            timestampString = "449276874.309867"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "664"
-            endingLineNumber = "664"
+            startingLineNumber = "729"
+            endingLineNumber = "729"
             landmarkName = "-controller:didChangeObject:atIndexPath:forChangeType:newIndexPath:"
             landmarkType = "5">
          </BreakpointContent>
@@ -590,11 +590,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Notizen/ContainerViewController.m"
-            timestampString = "449271178.208715"
+            timestampString = "449276874.309867"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "668"
-            endingLineNumber = "668"
+            startingLineNumber = "733"
+            endingLineNumber = "733"
             landmarkName = "-controllerDidChangeContent:"
             landmarkType = "5">
          </BreakpointContent>
@@ -606,11 +606,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Notizen/ContainerViewController.m"
-            timestampString = "449271178.208715"
+            timestampString = "449276874.309867"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "673"
-            endingLineNumber = "673"
+            startingLineNumber = "738"
+            endingLineNumber = "738"
             landmarkName = "-controllerDidChangeContent:"
             landmarkType = "5">
          </BreakpointContent>
@@ -622,11 +622,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Notizen/ContainerViewController.m"
-            timestampString = "449271178.208715"
+            timestampString = "449276874.309867"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "680"
-            endingLineNumber = "680"
+            startingLineNumber = "745"
+            endingLineNumber = "745"
             landmarkName = "@implementation ContainerViewController"
             landmarkType = "3">
          </BreakpointContent>
@@ -638,11 +638,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Notizen/ContainerViewController.m"
-            timestampString = "449271178.208715"
+            timestampString = "449276874.309867"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "696"
-            endingLineNumber = "696"
+            startingLineNumber = "761"
+            endingLineNumber = "761"
             landmarkName = "-deleteTextView:"
             landmarkType = "5">
          </BreakpointContent>
