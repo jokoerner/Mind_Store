@@ -22,6 +22,21 @@
     return self;
 }
 
+- (void)updateSize:(CGSize)newSize {
+    CGFloat width = newSize.width;
+    CGFloat heigth = newSize.height;
+    CGRect frame = CGRectMake(width/4.0, (heigth/2.0-width/4.0), width/2.0, width/2.0);
+    
+    //dimView
+    CGRect newFrame = dimView.frame;
+    newFrame.size.width = newSize.width;
+    newFrame.size.height = newSize.height;
+    [dimView setFrame:newFrame];
+    
+    //self
+    [self setFrame:frame];
+}
+
 - (void)drawInterface {
     self.layer.masksToBounds = YES;
     self.layer.cornerRadius = 35;

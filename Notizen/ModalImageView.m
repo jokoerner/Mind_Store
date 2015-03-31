@@ -99,6 +99,24 @@
     }];
 }
 
+- (void)updateSize:(CGSize)newSize {
+    //dimView
+    CGRect frame = self.dimView.frame;
+    frame.size.width = newSize.width;
+    frame.size.height = newSize.height;
+    [self.dimView setFrame:frame];
+    
+    //scrollView und imageView
+    frame = self.scrollView.frame;
+    frame.size.width = newSize.width-10;
+    frame.size.height = newSize.height-64-10;
+    [self.scrollView setFrame:frame];
+    [self.imageView setFrame:frame];
+    
+    //self
+    [self setFrame:CGRectMake(0, self.offset, newSize.width, newSize.height)];
+}
+
 - (void)dismiss {
     [UIView animateWithDuration:0.3 animations:^{
         [self.imageView setFrame:startingFrame];

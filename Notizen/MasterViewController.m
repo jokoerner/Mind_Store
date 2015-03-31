@@ -61,10 +61,10 @@
     [self handleAppearance];
     [self initSearchBar];
     
-    self.tableView.contentOffset = CGPointMake(0, self.searchController.searchBar.frame.size.height);
-    
     observe(self, @selector(newContainer:), @"newContainer");
     observe(self, @selector(selectFirstContainer), @"noContainer");
+    
+    self.tableView.contentOffset = CGPointMake(0, self.searchController.searchBar.frame.size.height);
 }
 
 - (void)initSearchBar {
@@ -112,12 +112,36 @@
     observe(self, @selector(selectedObjectFromSearch:), @"selectedObjectFromSearch");
     observe(self, @selector(newContainer:), @"newContainer");
     observe(self, @selector(selectFirstContainer), @"noContainer");
+    observe(self, @selector(hideBarButtonItems), @"showingImageView");
+    observe(self, @selector(showBarButtonItems), @"hidingImageView");
     
     if (iPhone) [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+    if (iPad) {
+        [self moveToNewOrientation];
+        if (self.splitViewController.viewControllers.count > 0) {
+            UINavigationController *navCon = self.splitViewController.viewControllers[1];
+            ContainerViewController *conti = (ContainerViewController *)navCon.topViewController;
+            if (conti) {
+                NoteContainer *object = conti.container;
+                if (object) {
+                    NSIndexPath *iP = [self.fetchedResultsController indexPathForObject:object];
+                    [self.tableView selectRowAtIndexPath:iP animated:NO scrollPosition:UITableViewScrollPositionMiddle];
+                }
+            }
+        }
+    }
+}
+
+- (void)hideBarButtonItems {
+    self.navigationItem.rightBarButtonItems = @[];
+    self.navigationItem.leftBarButtonItems = @[];
+}
+
+- (void)showBarButtonItems {
+    [self resetBarButtonItems];
 }
 
 - (void)selectFirstContainer {
-    
     if (iPad) {
         if (!self.tableView.indexPathForSelectedRow && !myTextField) {
             if (self.fetchedResultsController.fetchedObjects.count > 0) {
@@ -572,6 +596,17 @@
  */
 
 #pragma mark - Rotation
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [self moveToNewOrientation];
+}
+
+- (void)moveToNewOrientation {
+    UIImageView *background = [self.navigationController.view.subviews objectAtIndex:0];
+    [background setFrame:CGRectMake(0, 0, self.navigationController.view.frame.size.width, self.navigationController.view.frame.size.height)];
+    [background setContentMode:UIViewContentModeScaleAspectFill];
+    
+}
 
 - (NSUInteger) supportedInterfaceOrientations {
     // Return a bitmask of supported orientations. If you need more,

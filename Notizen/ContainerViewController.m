@@ -33,7 +33,7 @@
 - (void)handleAppearance {
     setBackgroundForView(self.navigationController.view);
     UIImageView *background = [self.navigationController.view.subviews objectAtIndex:0];
-    [background setFrame:CGRectMake(0, 0, self.navigationController.view.frame.size.width, self.navigationController.view.frame.size.height)];
+    [background setFrame:CGRectMake(0, 0, self.navigationController.view.frame.size.width, self.navigationController.view.frame.size.height-64)];
     [background setContentMode:UIViewContentModeScaleAspectFill];
     [self.view setBackgroundColor:[UIColor clearColor]];
     [self.tableView setBackgroundColor:[UIColor clearColor]];
@@ -57,12 +57,12 @@
     }
     
     UILabel *label = [[UILabel alloc] init];
-    if (section == 0) {
-        label.frame = CGRectMake(20, 28, 320, 20);
-    }
-    else {
+//    if (section == 0) {
+//        label.frame = CGRectMake(20, 28, 320, 20);
+//    }
+//    else {
         label.frame = CGRectMake(20, 8, 320, 20);
-    }
+//    }
     label.backgroundColor = [UIColor clearColor];
     label.textColor = [UIColor colorWithWhite:1.0 alpha:0.8];
     label.shadowColor = [UIColor grayColor];
@@ -114,9 +114,13 @@
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
+    
     [super viewWillDisappear:animated];
     
+    post(@"hidingImageView");
     removeObserverForName(self, @"accessoryButtonAction");
+    
+    if (iPad && textView) removeObserver(textView);
     
     [[StoreHandler shared] stopAudio];
 }
@@ -348,8 +352,6 @@
         ImageCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ImageCell" forIndexPath:indexPath];
         UIImage *image = [UIImage imageWithData:object.data];
         cell.noteImageView.image = image;
-        CGFloat height = [self tableView:tableView heightForRowAtIndexPath:indexPath];
-        [cell.noteImageView setFrame:CGRectMake(10, 0, self.view.frame.size.width-20, height)];
         
         //[cell setMuchEditing:self.editing];
         [self handleCellAppearance:cell];
@@ -368,8 +370,6 @@
     }
     else if ([dataType isEqualToString:@"location"]) {
         LocationCell *cell = [tableView dequeueReusableCellWithIdentifier:@"LocationCell" forIndexPath:indexPath];
-        CGFloat height = [self tableView:tableView heightForRowAtIndexPath:indexPath];
-        [cell.noteMapView setFrame:CGRectMake(10, 0, self.view.frame.size.width-20, height)];
         NSData *data = object.data;
         CLLocationCoordinate2D coordinate;
         [data getBytes:&coordinate length:sizeof(coordinate)];
@@ -628,16 +628,18 @@
         }
     }
     else if ([object.dataType isEqualToString:@"image"]) {
+        post(@"showingImageView");
         ImageCell *cell = (ImageCell *)[self tableView:tableView cellForRowAtIndexPath:indexPath];
         [self.tableView setUserInteractionEnabled:NO];
         imageView = [[ModalImageView alloc] initWithImage:cell.noteImageView.image];
         [imageView setOffset:64.0];
+        
         CGRect frame = [self.view convertRect:cell.noteImageView.frame fromView:cell];
         if (iPhone) {
             [imageView showFromFrame:frame onTopOfView:self.navigationController.view];
         }
         else {
-            [imageView showFromFrame:frame onTopOfView:self.splitViewController.view];
+            [imageView showFromFrame:[self.view convertRect:frame toView:self.splitViewController.view] onTopOfView:self.splitViewController.view];
         }
         UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissImageView:)];
         UIBarButtonItem *trash = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteImageView:)];
@@ -672,6 +674,15 @@
         tempCoordinate = coordinate;
     }
 }
+
+//#pragma mark - PinchGesture
+//
+//-(void)handlePinchGesture:(UIPinchGestureRecognizer*)gestureRecognizer {
+//    if(UIGestureRecognizerStateEnded == [gestureRecognizer state]){
+//        NSLog(@"begin");
+//        NSLog(@"%.2f", gestureRecognizer.scale);
+//    }
+//}
 
 
 #pragma mark - Fetched results controller
@@ -959,6 +970,7 @@
 }
 
 - (void)dismissImageView:(UIBarButtonItem *)item {
+    post(@"hidingImageView");
     NoteContent *object = editingObject;
     editNote = object.note;
     [self.tableView setUserInteractionEnabled:YES];
@@ -1332,16 +1344,33 @@
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context)
      {
+         if (iPad) {
+             [self moveToNewOrientation];
+             if (mapView) [mapView updateSize:self.navigationController.view.frame.size];
+             if (textView) [textView updateSize:self.navigationController.view.frame.size];
+             if (imageView) [imageView updateSize:self.splitViewController.view.frame.size];
+             if (contentChoice) [contentChoice updateSize:self.navigationController.view.frame.size];
+             return;
+         }
+         
          UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
          if (orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight) {
              // transitioning to landscape
-             [imageView moveToLandscapeWithSize:size];
-             [self.navigationController setNavigationBarHidden:YES animated:YES];
+             if (imageView) {
+                 [imageView moveToLandscapeWithSize:size];
+                 if (iPhone) {
+                     [self.navigationController setNavigationBarHidden:YES animated:YES];
+                 }
+             }
          }
          else {
              // transitioning to portrait
-             [imageView moveToPortraitWithSize:size];
-             [self.navigationController setNavigationBarHidden:NO animated:YES];
+             if (imageView) {
+                 [imageView moveToPortraitWithSize:size];
+                 if (iPhone) {
+                     [self.navigationController setNavigationBarHidden:NO animated:YES];
+                 }
+             }
          }
      } completion:^(id<UIViewControllerTransitionCoordinatorContext> context)
      {
@@ -1349,6 +1378,13 @@
      }];
     
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+}
+
+- (void)moveToNewOrientation {
+    UIImageView *background = [self.navigationController.view.subviews objectAtIndex:0];
+    [background setFrame:CGRectMake(0, 0, self.navigationController.view.frame.size.width, self.navigationController.view.frame.size.height-64)];
+    [background setContentMode:UIViewContentModeScaleAspectFill];
+    
 }
 
 - (NSUInteger) supportedInterfaceOrientations {

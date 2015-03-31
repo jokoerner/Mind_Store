@@ -22,6 +22,7 @@
 - (void)showFromFrame:(CGRect)anImageViewFrame onTopOfView:(UIView *)aView;
 - (void)updateImage:(UIImage *)anImage;
 - (void)dismiss;
+- (void)updateSize:(CGSize)newSize;
 
 - (void)moveToLandscapeWithSize:(CGSize)size;
 - (void)moveToPortraitWithSize:(CGSize)size;

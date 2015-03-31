@@ -19,5 +19,6 @@
 - (id)initWithText:(NSString *)aText;;
 - (void)showFromFrame:(CGRect)aTextViewFrame onTopOfView:(UIView *)aView;
 - (void)dismiss;
+- (void)updateSize:(CGSize)newSize;
 
 @end

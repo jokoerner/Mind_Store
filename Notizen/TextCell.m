@@ -39,6 +39,10 @@
     
     if (height <= 44.0) [self.noteTextView setFont:customTableFont];
     
+    CGRect oldFrame = self.noteTextView.frame;
+    oldFrame.size.width = self.frame.size.width-20;
+    [self.noteTextView setFrame:oldFrame];
+    
     if (![self.contentView.subviews containsObject:self.noteTextView]) [self.contentView addSubview:self.noteTextView];
     
     //[self moveSubviews];

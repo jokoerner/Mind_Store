@@ -79,8 +79,8 @@
 }
 
 - (void)layoutSubviews {
+    [self.noteMapView setFrame:CGRectMake(10, 0, self.frame.size.width-20, 240.0)];
     if (![self.contentView.subviews containsObject:self.noteMapView]) [self.contentView addSubview:self.noteMapView];
-    //[self moveSubviews];
     [super layoutSubviews];
 }
 

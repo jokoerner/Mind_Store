@@ -17,6 +17,8 @@
         self.dimView = [[UIView alloc] initWithFrame:CGRectNull];
         [self.dimView setBackgroundColor:[UIColor blackColor]];
         [self.mapView.layer setOpacity:0.0];
+        self.mapView.layer.masksToBounds = YES;
+        self.mapView.layer.cornerRadius = 5.0;
         [self.dimView.layer setOpacity:0.0];
         [self.mapView setShowsUserLocation:YES];
         coordinate = aCoordinate;
@@ -53,6 +55,23 @@
     } completion:^(BOOL finished) {
         [self addAnnotation];
     }];
+}
+
+- (void)updateSize:(CGSize)newSize {
+    //dimView
+    CGRect frame = self.dimView.frame;
+    frame.size.width = newSize.width;
+    frame.size.height = newSize.height;
+    [self.dimView setFrame:frame];
+    
+    //mapView
+    frame = self.mapView.frame;
+    frame.size.width = newSize.width-10;
+    frame.size.height = newSize.height-64-10;
+    [self.mapView setFrame:frame];
+    
+    //self
+    [self setFrame:CGRectMake(0, self.offset, newSize.width, newSize.height)];
 }
 
 - (void)showLocationInMaps {

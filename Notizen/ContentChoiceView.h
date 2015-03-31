@@ -34,5 +34,6 @@
 
 - (void)showInView:(UIView *)theView;
 - (void)dismiss;
+- (void)updateSize:(CGSize)newSize;
 
 @end

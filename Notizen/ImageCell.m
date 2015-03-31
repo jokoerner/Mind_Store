@@ -28,6 +28,13 @@
 }
 
 - (void)layoutSubviews {
+    if (self.noteImageView.image.size.height < 300) {
+        [self.noteImageView setFrame:CGRectMake(10, 0, self.frame.size.width-20, self.noteImageView.image.size.height)];
+    }
+    else {
+        [self.noteImageView setFrame:CGRectMake(10, 0, self.frame.size.width-20, 300.0)];
+    }
+    
     if (![self.contentView.subviews containsObject:self.noteImageView]) [self.contentView addSubview:self.noteImageView];
     
     //[self moveSubviews];

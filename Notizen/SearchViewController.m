@@ -35,7 +35,7 @@
 - (void)handleAppearance {
     setBackgroundForView(self.navigationController.view);
     UIImageView *background = [self.navigationController.view.subviews objectAtIndex:0];
-    [background setFrame:CGRectMake(0, 0, self.navigationController.view.frame.size.width, self.navigationController.view.frame.size.height)];
+    [background setFrame:CGRectMake(0, 0, self.navigationController.view.frame.size.width, self.navigationController.view.frame.size.height-64)];
     [background setContentMode:UIViewContentModeScaleAspectFill];
     [self.view setBackgroundColor:[UIColor clearColor]];
     [self.tableView setBackgroundColor:[UIColor clearColor]];
@@ -90,6 +90,17 @@
 }
 
 #pragma mark - Rotation
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [self moveToNewOrientation];
+}
+
+- (void)moveToNewOrientation {
+    UIImageView *background = [self.navigationController.view.subviews objectAtIndex:0];
+    [background setFrame:CGRectMake(0, 0, self.navigationController.view.frame.size.width, self.navigationController.view.frame.size.height-64)];
+    [background setContentMode:UIViewContentModeScaleAspectFill];
+    
+}
 
 - (NSUInteger) supportedInterfaceOrientations {
     // Return a bitmask of supported orientations. If you need more,

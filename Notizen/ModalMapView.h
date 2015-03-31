@@ -21,5 +21,6 @@
 - (id)initWithCoordinate:(CLLocationCoordinate2D)aCoordinate;
 - (void)showFromFrame:(CGRect)aMapViewFrame onTopOfView:(UIView *)aView;
 - (void)dismiss;
+- (void)updateSize:(CGSize)newSize;
 
 @end
