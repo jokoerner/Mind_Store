@@ -7,6 +7,7 @@
 //
 
 #import "RotationController.h"
+#import "StoreHandler.h"
 
 @interface RotationController ()
 
@@ -26,7 +27,12 @@
 }
 
 - (NSUInteger)supportedInterfaceOrientations {
-    return [self.topViewController supportedInterfaceOrientations];
+    if (iPhone) {
+        return [self.topViewController supportedInterfaceOrientations];
+    }
+    else {
+        return UIInterfaceOrientationMaskAll;
+    }
 }
 
 - (BOOL)shouldAutorotate {

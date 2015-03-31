@@ -10,7 +10,7 @@
 #import <CoreData/CoreData.h>
 #import "StoreHandler.h"
 
-@class ContainerViewController;
+@class ContainerViewController, NoteContainer;
 
 @interface MasterViewController : UITableViewController <NSFetchedResultsControllerDelegate, UITextFieldDelegate, UISearchResultsUpdating, UISearchBarDelegate> {
     UIImageView *topImageview;
@@ -23,6 +23,8 @@
     
     NSIndexPath *tempIndexPath;
     NSIndexPath *searchIndexPath;
+    
+    NoteContainer *tempContainer;
 }
 
 @property (nonatomic, strong) UISearchController *searchController;

@@ -11,6 +11,7 @@
 		E424DFE21AB0A287000636F2 /* ContentChoiceView.m in Sources */ = {isa = PBXBuildFile; fileRef = E424DFE11AB0A287000636F2 /* ContentChoiceView.m */; };
 		E43B0DFB1AA9E3B10050EC8B /* RotationController.m in Sources */ = {isa = PBXBuildFile; fileRef = E43B0DFA1AA9E3B10050EC8B /* RotationController.m */; };
 		E43B0E041AA9E6900050EC8B /* RotationSplitViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E43B0E031AA9E6900050EC8B /* RotationSplitViewController.m */; };
+		E4442D461AC9AD1E0072DC2D /* ScaleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = E4442D451AC9AD1E0072DC2D /* ScaleButton.m */; };
 		E4589C5A1AB72E33002064B6 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E4589C5C1AB72E33002064B6 /* Localizable.strings */; };
 		E4589C641AB7374F002064B6 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E4589C621AB72EFF002064B6 /* Info.plist */; };
 		E4589C6C1AB73BC8002064B6 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = E4589C6B1AB73BC8002064B6 /* Settings.bundle */; };
@@ -24,7 +25,9 @@
 		E45E9A991AB9BC1700F43F9D /* SaveLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = E45E9A981AB9BC1700F43F9D /* SaveLocation.m */; };
 		E45E9A9C1AB9BC8900F43F9D /* ShowLocations.m in Sources */ = {isa = PBXBuildFile; fileRef = E45E9A9B1AB9BC8900F43F9D /* ShowLocations.m */; };
 		E460311D1AAF22ED00DA7203 /* ModalImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = E460311C1AAF22ED00DA7203 /* ModalImageView.m */; };
+		E46344841AC98C22007E6C47 /* InsertContainerController.m in Sources */ = {isa = PBXBuildFile; fileRef = E46344831AC98C22007E6C47 /* InsertContainerController.m */; };
 		E46D8E221AC7202B00663FBF /* SearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E46D8E211AC7202B00663FBF /* SearchViewController.m */; };
+		E46D8E251AC84A2700663FBF /* MasterCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E46D8E241AC84A2700663FBF /* MasterCell.m */; };
 		E491F7921AB84F2E0096092B /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = E491F7941AB84F2E0096092B /* InfoPlist.strings */; };
 		E491F7971AB85C270096092B /* AddressBookUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E491F7961AB85C270096092B /* AddressBookUI.framework */; };
 		E495F5461ABC5457000FC17E /* MoveViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E495F5451ABC5457000FC17E /* MoveViewController.m */; };
@@ -102,6 +105,8 @@
 		E43B0DFA1AA9E3B10050EC8B /* RotationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RotationController.m; sourceTree = "<group>"; };
 		E43B0E021AA9E6900050EC8B /* RotationSplitViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RotationSplitViewController.h; sourceTree = "<group>"; };
 		E43B0E031AA9E6900050EC8B /* RotationSplitViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RotationSplitViewController.m; sourceTree = "<group>"; };
+		E4442D441AC9AD1E0072DC2D /* ScaleButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScaleButton.h; sourceTree = "<group>"; };
+		E4442D451AC9AD1E0072DC2D /* ScaleButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScaleButton.m; sourceTree = "<group>"; };
 		E4589C5D1AB72E3B002064B6 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E4589C5E1AB72E3F002064B6 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E4589C601AB72E6C002064B6 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = en; path = en.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -125,8 +130,12 @@
 		E45E9A9B1AB9BC8900F43F9D /* ShowLocations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShowLocations.m; sourceTree = "<group>"; };
 		E460311B1AAF22ED00DA7203 /* ModalImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalImageView.h; sourceTree = "<group>"; };
 		E460311C1AAF22ED00DA7203 /* ModalImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalImageView.m; sourceTree = "<group>"; };
+		E46344821AC98C22007E6C47 /* InsertContainerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InsertContainerController.h; sourceTree = "<group>"; };
+		E46344831AC98C22007E6C47 /* InsertContainerController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InsertContainerController.m; sourceTree = "<group>"; };
 		E46D8E201AC7202B00663FBF /* SearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchViewController.h; sourceTree = "<group>"; };
 		E46D8E211AC7202B00663FBF /* SearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchViewController.m; sourceTree = "<group>"; };
+		E46D8E231AC84A2700663FBF /* MasterCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MasterCell.h; sourceTree = "<group>"; };
+		E46D8E241AC84A2700663FBF /* MasterCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MasterCell.m; sourceTree = "<group>"; };
 		E491F7931AB84F2E0096092B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E491F7951AB84F300096092B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		E491F7961AB85C270096092B /* AddressBookUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBookUI.framework; path = System/Library/Frameworks/AddressBookUI.framework; sourceTree = SDKROOT; };
@@ -315,6 +324,8 @@
 				E43B0E051AA9E7940050EC8B /* Rotation Controllers */,
 				E4BD6F2C1AA62A9E00B2356E /* MasterViewController.h */,
 				E4BD6F2D1AA62A9E00B2356E /* MasterViewController.m */,
+				E46344821AC98C22007E6C47 /* InsertContainerController.h */,
+				E46344831AC98C22007E6C47 /* InsertContainerController.m */,
 				E46D8E201AC7202B00663FBF /* SearchViewController.h */,
 				E46D8E211AC7202B00663FBF /* SearchViewController.m */,
 				E4E047DC1AA747B800A93216 /* ContainerViewController.h */,
@@ -323,6 +334,8 @@
 				E495F5451ABC5457000FC17E /* MoveViewController.m */,
 				E424DFE01AB0A287000636F2 /* ContentChoiceView.h */,
 				E424DFE11AB0A287000636F2 /* ContentChoiceView.m */,
+				E4442D441AC9AD1E0072DC2D /* ScaleButton.h */,
+				E4442D451AC9AD1E0072DC2D /* ScaleButton.m */,
 				E495F5431ABC4E14000FC17E /* Modal Controllers */,
 				E4E047F71AA787BD00A93216 /* TableViewCell Subclasses */,
 				E4BD6F321AA62A9E00B2356E /* Main.storyboard */,
@@ -388,6 +401,8 @@
 				E4E047F21AA787A700A93216 /* AudioCell.m */,
 				E4E047F41AA787B500A93216 /* LocationCell.h */,
 				E4E047F51AA787B500A93216 /* LocationCell.m */,
+				E46D8E231AC84A2700663FBF /* MasterCell.h */,
+				E46D8E241AC84A2700663FBF /* MasterCell.m */,
 			);
 			name = "TableViewCell Subclasses";
 			sourceTree = "<group>";
@@ -584,6 +599,7 @@
 				E4E047ED1AA7879300A93216 /* VideoCell.m in Sources */,
 				E4BD6F5C1AA63CFE00B2356E /* NoteContent.m in Sources */,
 				E4E047F61AA787B500A93216 /* LocationCell.m in Sources */,
+				E46D8E251AC84A2700663FBF /* MasterCell.m in Sources */,
 				E43B0DFB1AA9E3B10050EC8B /* RotationController.m in Sources */,
 				E4E047EA1AA7878300A93216 /* ImageCell.m in Sources */,
 				E4BD6F2E1AA62A9E00B2356E /* MasterViewController.m in Sources */,
@@ -598,9 +614,11 @@
 				E4BD6F561AA63CFD00B2356E /* NoteContainer.m in Sources */,
 				E4BF73E71AB1D61300F8042C /* ModalMapView.m in Sources */,
 				E4086E6F1AA8A0D70049A1F5 /* ModalTextView.m in Sources */,
+				E46344841AC98C22007E6C47 /* InsertContainerController.m in Sources */,
 				E4BD6F2B1AA62A9E00B2356E /* Notizen.xcdatamodeld in Sources */,
 				E495F5461ABC5457000FC17E /* MoveViewController.m in Sources */,
 				E4E047F31AA787A700A93216 /* AudioCell.m in Sources */,
+				E4442D461AC9AD1E0072DC2D /* ScaleButton.m in Sources */,
 				E4BD6F591AA63CFE00B2356E /* Note.m in Sources */,
 				E495F5501ABC6A2B000FC17E /* BVReorderTableView.m in Sources */,
 				E46D8E221AC7202B00663FBF /* SearchViewController.m in Sources */,

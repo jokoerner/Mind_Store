@@ -12,6 +12,7 @@
 #import "Note.h"
 #import "NoteContent.h"
 #import "SearchViewController.h"
+#import "InsertContainerController.h"
 
 #define DEGREES_TO_RADIANS(d) (d * M_PI / 180)
 
@@ -61,6 +62,9 @@
     [self initSearchBar];
     
     self.tableView.contentOffset = CGPointMake(0, self.searchController.searchBar.frame.size.height);
+    
+    observe(self, @selector(newContainer:), @"newContainer");
+    observe(self, @selector(selectFirstContainer), @"noContainer");
 }
 
 - (void)initSearchBar {
@@ -100,13 +104,33 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
+    removeObserver(self);
     observe(self, @selector(updateUserInterface), @"updateUserInterface");
     observe(self, @selector(dropReferencesToManagedObjects), @"dropReferencesToManagedObjects");
     observe(self, @selector(enableUserInteraction), @"enableUserInteraction");
     observe(self, @selector(disableUserInteraction), @"disableUserInteraction");
     observe(self, @selector(selectedObjectFromSearch:), @"selectedObjectFromSearch");
+    observe(self, @selector(newContainer:), @"newContainer");
+    observe(self, @selector(selectFirstContainer), @"noContainer");
     
-    [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+    if (iPhone) [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
+}
+
+- (void)selectFirstContainer {
+    
+    if (iPad) {
+        if (!self.tableView.indexPathForSelectedRow && !myTextField) {
+            if (self.fetchedResultsController.fetchedObjects.count > 0) {
+                NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+                [self.tableView selectRowAtIndexPath:indexPath animated:YES scrollPosition:UITableViewScrollPositionNone];
+                [self performSegueWithIdentifier:@"showDetail" sender:self];
+            }
+            else {
+                //Neu anlegen
+                [self insertNewObject:nil];
+            }
+        }
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -137,7 +161,20 @@
 
 #pragma mark - Neues Objekt erstellen
 
+- (void)newContainer:(NSNotification *)notification {
+    NSString *string = notification.object;
+    [self insertNewObjectWithTitle:string];
+}
+
 - (void)insertNewObject:(id)sender {
+    if (iPad) {
+        InsertContainerController *vc = [[UIStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]] instantiateViewControllerWithIdentifier:@"insertContainer"];
+        vc.canCancel = (self.fetchedResultsController.fetchedObjects.count == 0) ? NO : YES;
+        UINavigationController *navCon = [[UINavigationController alloc] initWithRootViewController:vc];
+        [navCon setModalPresentationStyle:UIModalPresentationFormSheet];
+        [self.navigationController presentViewController:navCon animated:YES completion:nil];
+        return;
+    }
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(dismissNewObjectStuffAndMoveToObject:)];
     self.navigationItem.rightBarButtonItems = @[];
     
@@ -221,7 +258,7 @@
 //    [self.navigationController pushViewController:controller animated:YES];
     
     [context save:nil];
-    [self dismissNewObjectStuffAndMoveToObject:newManagedObject];
+    if (iPhone) [self dismissNewObjectStuffAndMoveToObject:newManagedObject];
 }
 
 - (void)dismissNewObjectStuffAndMoveToObject:(NoteContainer *)object {
@@ -270,7 +307,34 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
+        if (!indexPath) {
+            ContainerViewController *controller = (ContainerViewController *)[[segue destinationViewController] topViewController];
+            [controller setManagedObjectContext:nil];
+            controller.fetchedResultsController = nil;
+            [controller setContainer:nil];
+            [controller setTitle:@"Mind Store"];
+            if (searchIndexPath) {
+                controller.searchIndexPath = nil;
+                searchIndexPath = nil;
+            }
+            controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
+            controller.navigationItem.leftItemsSupplementBackButton = YES;
+            return;
+        }
         NSManagedObject *object = [[self fetchedResultsController] objectAtIndexPath:indexPath];
+        ContainerViewController *controller = (ContainerViewController *)[[segue destinationViewController] topViewController];
+        [controller setContainer:(NoteContainer *)object];
+        [controller setManagedObjectContext:self.managedObjectContext];
+        [controller setTitle:[object valueForKey:@"title"]];
+        if (searchIndexPath) {
+            controller.searchIndexPath = searchIndexPath;
+            searchIndexPath = nil;
+        }
+        controller.navigationItem.leftBarButtonItem = self.splitViewController.displayModeButtonItem;
+        controller.navigationItem.leftItemsSupplementBackButton = YES;
+    }
+    else if ([[segue identifier] isEqualToString:@"forceShowDetail"]) {
+        NSManagedObject *object = tempContainer;
         ContainerViewController *controller = (ContainerViewController *)[[segue destinationViewController] topViewController];
         [controller setContainer:(NoteContainer *)object];
         [controller setManagedObjectContext:self.managedObjectContext];
@@ -309,7 +373,29 @@
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         NSManagedObjectContext *context = [self.fetchedResultsController managedObjectContext];
-        [context deleteObject:[self.fetchedResultsController objectAtIndexPath:indexPath]];
+        NoteContainer *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
+        if (iPad) { //neuen Container auswählen
+            NSArray *fetchedObjects = self.fetchedResultsController.fetchedObjects;
+            if (fetchedObjects.count > 1) {
+                NSInteger indexOfObject = [fetchedObjects indexOfObject:object];
+                NoteContainer *newObject;
+                if (fetchedObjects.count-1 > indexOfObject) {
+                    newObject = [fetchedObjects objectAtIndex:indexOfObject+1];
+                }
+                else {
+                    newObject = [fetchedObjects objectAtIndex:indexOfObject-1];
+                }
+                tempContainer = newObject;
+                [self.tableView selectRowAtIndexPath:[self.fetchedResultsController indexPathForObject:newObject] animated:YES scrollPosition:UITableViewScrollPositionNone];
+                [self performSegueWithIdentifier:@"forceShowDetail" sender:self];
+            }
+            else {
+                NSIndexPath *selectedRow = [self.tableView indexPathForSelectedRow];
+                if (selectedRow) [self.tableView deselectRowAtIndexPath:selectedRow animated:YES];
+                [self performSegueWithIdentifier:@"showDetail" sender:self];
+            }
+        }
+        [context deleteObject:object];
             
         NSError *error = nil;
         if (![context save:&error]) {
@@ -490,7 +576,12 @@
 - (NSUInteger) supportedInterfaceOrientations {
     // Return a bitmask of supported orientations. If you need more,
     // use bitwise or (see the commented return).
-    return UIInterfaceOrientationMaskPortrait;
+    if (iPhone) {
+        return UIInterfaceOrientationMaskPortrait;
+    }
+    else {
+        return UIInterfaceOrientationMaskAll;
+    }
     // return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskPortraitUpsideDown;
 }
 
@@ -502,6 +593,8 @@
 }
 
 - (BOOL)shouldAutorotate {
+    if (iPad) return YES;
+    
     return NO;
 }
 

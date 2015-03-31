@@ -41,28 +41,28 @@
     [cancelButton setImage:[UIImage imageNamed:@"Cancel"] forState:UIControlStateNormal];
     [cancelButton addTarget:self action:@selector(cancel) forControlEvents:UIControlEventTouchUpInside];
     
-    textButton = [[UIButton alloc] initWithFrame:CGRectMake(15,
+    textButton = [[ScaleButton alloc] initWithFrame:CGRectMake(15,
                                                                       15,
                                                                       width/3.0,
                                                                       height/3.0)];
     [textButton setImage:[UIImage imageNamed:@"Compose"] forState:UIControlStateNormal];
     [textButton addTarget:self action:@selector(compose) forControlEvents:UIControlEventTouchUpInside];
     
-    photoButton = [[UIButton alloc] initWithFrame:CGRectMake(width/3.0*2.0-15,
+    photoButton = [[ScaleButton alloc] initWithFrame:CGRectMake(width/3.0*2.0-15,
                                                                        15,
                                                                        width/3.0,
                                                                        height/3.0)];
     [photoButton setImage:[UIImage imageNamed:@"Photo"] forState:UIControlStateNormal];
     [photoButton addTarget:self action:@selector(photo) forControlEvents:UIControlEventTouchUpInside];
     
-    audioButton = [[UIButton alloc] initWithFrame:CGRectMake(15,
+    audioButton = [[ScaleButton alloc] initWithFrame:CGRectMake(15,
                                                                         height/3.0*2.0-15,
                                                                         width/3.0,
                                                                         height/3.0)];
     [audioButton setImage:[UIImage imageNamed:@"Audio"] forState:UIControlStateNormal];
     [audioButton addTarget:self action:@selector(audio) forControlEvents:UIControlEventTouchUpInside];
     
-    locationButton = [[UIButton alloc] initWithFrame:CGRectMake(width/3.0*2.0-15,
+    locationButton = [[ScaleButton alloc] initWithFrame:CGRectMake(width/3.0*2.0-15,
                                                                           height/3.0*2.0-15,
                                                                           width/3.0,
                                                                           height/3.0)];

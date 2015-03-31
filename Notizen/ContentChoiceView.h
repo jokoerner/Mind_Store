@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
+#import "ScaleButton.h"
 
 @interface ContentChoiceView : UIView <AVAudioRecorderDelegate> {
     CGRect endFrame;
@@ -23,10 +24,10 @@
     AVAudioRecorder *recorder;
     NSString *recorderFilePath;
     
-    UIButton *textButton;
-    UIButton *audioButton;
-    UIButton *photoButton;
-    UIButton *locationButton;
+    ScaleButton *textButton;
+    ScaleButton *audioButton;
+    ScaleButton *photoButton;
+    ScaleButton *locationButton;
 }
 
 - (id)initWithFrame:(CGRect)frame;

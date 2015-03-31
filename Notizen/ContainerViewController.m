@@ -84,19 +84,31 @@
     
     // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
     // self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    [self resetBarButtonItems];
     [self handleAppearance];
 }
 
 - (void)resetBarButtonItems {
     [self.navigationItem setHidesBackButton:NO animated:YES];
     UIBarButtonItem *addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(insertNewObject:)];
-    self.navigationItem.rightBarButtonItems = @[addButton, self.editButtonItem];
-    self.navigationItem.leftBarButtonItems = @[];
+    if (self.managedObjectContext && self.container) {
+        self.navigationItem.rightBarButtonItems = @[addButton, self.editButtonItem];
+    }
+    else {
+        self.navigationItem.rightBarButtonItems = @[];
+    }
+    
+    if (iPhone) {
+        self.navigationItem.leftBarButtonItems = @[];
+    }
+    else if (self.navigationItem.leftBarButtonItems.count >= 1 && self.splitViewController.displayModeButtonItem) {
+        self.navigationItem.leftBarButtonItems = @[self.splitViewController.displayModeButtonItem];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
+    [self resetBarButtonItems];
     
     observe(self, @selector(handleAccessoryButtonAction:), @"accessoryButtonAction");
 }
@@ -111,7 +123,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    if (self.fetchedResultsController.fetchedObjects.count == 0) {
+    if (self.fetchedResultsController.fetchedObjects.count == 0 && self.managedObjectContext && self.container) {
         [self insertNewObject:nil];
     }
     else if (self.searchIndexPath) {
@@ -176,10 +188,25 @@
 
 - (void)insertNewObject:(UIBarButtonItem *)item {
     if (!contentChoice) {
-        CGFloat width = self.navigationController.view.superview.frame.size.width;
-        CGFloat heigth = self.navigationController.view.superview.frame.size.height;
+        CGFloat width;
+        CGFloat heigth;
+        if (iPhone) {
+            width = self.navigationController.view.superview.frame.size.width;
+            heigth = self.navigationController.view.superview.frame.size.height;
+        }
+        else if (iPad) {
+            width = self.navigationController.view.frame.size.width;
+            heigth = self.navigationController.view.frame.size.height;
+        }
+        
         contentChoice = [[ContentChoiceView alloc] initWithFrame:CGRectMake(width/4.0, (heigth/2.0-width/4.0), width/2.0, width/2.0)];
-        [contentChoice showInView:self.navigationController.view.superview.superview.superview];
+        
+        if (iPhone) {
+            [contentChoice showInView:self.navigationController.view.superview.superview.superview];
+        }
+        else {
+            [contentChoice showInView:self.navigationController.view];
+        }
         
         observe(self, @selector(compose:), @"ContentChoiceViewCompose");
         observe(self, @selector(photo:), @"ContentChoiceViewPhoto");
@@ -464,6 +491,10 @@
                 NSString *addressName = ABCreateStringWithAddressDictionary(placemark.addressDictionary, YES);
                 NSString *content = addressName;
                 UIActivityViewController *activity2 = [[UIActivityViewController alloc] initWithActivityItems:@[content] applicationActivities:nil];
+                activity2.popoverPresentationController.sourceView = self.navigationController.view;
+                UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+                activity2.popoverPresentationController.sourceRect = [self.tableView convertRect:cell.frame toView:self.navigationController.view];
+                activity2.popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirectionAny;
                 [self.navigationController presentViewController:activity2 animated:YES completion:nil];
             }];
             return;
@@ -480,6 +511,10 @@
             activity = [[UIActivityViewController alloc] initWithActivityItems:@[url] applicationActivities:nil];
         }
         
+        activity.popoverPresentationController.sourceView = self.navigationController.view;
+        UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+        activity.popoverPresentationController.sourceRect = [self.tableView convertRect:cell.frame toView:self.navigationController.view];
+        activity.popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirectionAny;
         [self.navigationController presentViewController:activity animated:YES completion:^{
             [self setEditing:NO animated:YES];
         }];
@@ -598,7 +633,12 @@
         imageView = [[ModalImageView alloc] initWithImage:cell.noteImageView.image];
         [imageView setOffset:64.0];
         CGRect frame = [self.view convertRect:cell.noteImageView.frame fromView:cell];
-        [imageView showFromFrame:frame onTopOfView:self.navigationController.view];
+        if (iPhone) {
+            [imageView showFromFrame:frame onTopOfView:self.navigationController.view];
+        }
+        else {
+            [imageView showFromFrame:frame onTopOfView:self.splitViewController.view];
+        }
         UIBarButtonItem *item = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(dismissImageView:)];
         UIBarButtonItem *trash = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteImageView:)];
         UIBarButtonItem *newImage = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(takePhoto:)];
@@ -638,6 +678,11 @@
 
 - (NSFetchedResultsController *)fetchedResultsController
 {
+    if (!self.managedObjectContext || !self.container) {
+        post(@"noContainer");
+        return nil;
+    }
+    
     if (_fetchedResultsController != nil) {
         return _fetchedResultsController;
     }
@@ -766,9 +811,10 @@
         editingObject = nil;
         sequence = NO;
     }
-    if ([[textView.textView.text substringFromIndex:textView.textView.text.length-1] isEqualToString:@" "]) {
+    else if ([[textView.textView.text substringFromIndex:textView.textView.text.length-1] isEqualToString:@" "]) {
         textView.textView.text = [textView.textView.text substringToIndex:textView.textView.text.length-1];
     }
+    
     if (textView.textView.text.length < 1) {
         editingObject = nil;
         sequence = NO;
@@ -858,12 +904,15 @@
         [button addTarget:self action:@selector(showLibrary:) forControlEvents:UIControlEventTouchUpInside];
         myCameraPicker.cameraOverlayView = button;
         
+        [myCameraPicker setModalPresentationStyle:UIModalPresentationPageSheet];
         [self.navigationController presentViewController:myCameraPicker animated:YES completion:NULL];
     }
     else if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]){
         myAlbumPicker = [[UIImagePickerController alloc] init];
         myAlbumPicker.delegate = self;
         myAlbumPicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+        
+        [myAlbumPicker setModalPresentationStyle:UIModalPresentationPageSheet];
         [self.navigationController presentViewController:myAlbumPicker animated:YES completion:NULL];
     }
     else {
@@ -933,6 +982,8 @@
     imageView = nil;
     [self resetBarButtonItems];
     [self.tableView setScrollEnabled:YES];
+    NSIndexPath *selectedRow = [self.tableView indexPathForSelectedRow];
+    if (selectedRow) [self.tableView deselectRowAtIndexPath:selectedRow animated:YES];
     [self.tableView beginUpdates];
     [self.tableView endUpdates];
     editingObject = nil;
@@ -1192,6 +1243,10 @@
     }
     else {
         UIActivityViewController *activity = [[UIActivityViewController alloc] initWithActivityItems:idObjects applicationActivities:nil];
+        if (iPad) {
+            activity.popoverPresentationController.sourceView = self.navigationController.view;
+            activity.popoverPresentationController.sourceRect = [editToolbar convertRect:[(UIView *)[editToolbar.subviews objectAtIndex:1] frame] toView:self.navigationController.view];
+        }
         [self.navigationController presentViewController:activity animated:YES completion:nil];
     }
 }
@@ -1209,6 +1264,9 @@
     [vc setNoteContents:noteContents];
     [vc setManagedObjectContext:self.managedObjectContext];
     RotationController *rotation = [[RotationController alloc] initWithRootViewController:vc];
+    if (iPad) {
+        [rotation setModalPresentationStyle:UIModalPresentationFormSheet];
+    }
     [self.navigationController presentViewController:rotation animated:YES completion:nil];
 }
 
@@ -1258,6 +1316,10 @@
     if (object == self && [keyPath isEqualToString:@"pending"]) {
         if (self.pending == 0) {
             UIActivityViewController *activity = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
+            if (iPad) {
+                activity.popoverPresentationController.sourceView = self.navigationController.view;
+                activity.popoverPresentationController.sourceRect = [editToolbar convertRect:[(UIView *)[editToolbar.subviews objectAtIndex:1] frame] toView:self.navigationController.view];
+            }
             [self.navigationController presentViewController:activity animated:YES completion:nil];
             activityItems = nil;
             [self removeObserver:self forKeyPath:@"pending"];
@@ -1292,6 +1354,9 @@
 - (NSUInteger) supportedInterfaceOrientations {
     // Return a bitmask of supported orientations. If you need more,
     // use bitwise or (see the commented return).
+    if (iPad) {
+        return UIInterfaceOrientationMaskAll;
+    }
     if (imageView) {
         return UIInterfaceOrientationMaskAllButUpsideDown;
     }
@@ -1307,6 +1372,9 @@
 }
 
 - (BOOL)shouldAutorotate {
+    if (iPad) {
+        return YES;
+    }
     if (imageView) {
         return YES;
     }
