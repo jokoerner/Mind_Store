@@ -10,4 +10,4 @@
 "CFBundleName"          =   "Mind Store";
 "CFBundleDisplayName"   =   "Mind Store";
 "NSLocationWhenInUseUsageDescription" = "You can add locations to a note.";
-"NSLocationAlwaysUsageDescription" = "You can add locations to a note. For this to work with the  Watch, Mind Store needs your permission to always access your location. Of course, you will still only be located on your request.";
+"NSLocationAlwaysUsageDescription" = "You can add locations to a note. For this to work with the Apple Watch, Mind Store needs your permission to always access your location. Of course, you will still only be located on your request.";

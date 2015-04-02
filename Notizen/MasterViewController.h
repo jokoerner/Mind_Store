@@ -23,6 +23,7 @@
     
     NSIndexPath *tempIndexPath;
     NSIndexPath *searchIndexPath;
+    NSIndexPath *preUpdateSelectedIndexPath;
     
     NoteContainer *tempContainer;
 }

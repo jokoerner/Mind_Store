@@ -10,4 +10,4 @@
 "CFBundleName"          =   "Mind Store";
 "CFBundleDisplayName"   =   "Mind Store";
 "NSLocationWhenInUseUsageDescription" = "Sie können Orte zu Notizen hinzufügen.";
-"NSLocationAlwaysUsageDescription" = "Sie können Orte zu Notizen hinzufügen. Damit dies auch mit der  Watch funktioniert, benötigt Mind Store Ihre Erlaubnis, immer auf Ihren Standort zugreifen zu können. Der Standort wird natürlich trotzdem nur auf Ihren Wunsch abgefragt.";
+"NSLocationAlwaysUsageDescription" = "Sie können Orte zu Notizen hinzufügen. Damit dies auch mit der Apple Watch funktioniert, benötigt Mind Store Ihre Erlaubnis, immer auf Ihren Standort zugreifen zu können. Der Standort wird natürlich trotzdem nur auf Ihren Wunsch abgefragt.";

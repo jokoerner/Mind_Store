@@ -895,6 +895,7 @@
         myAlbumPicker.delegate = self;
         myAlbumPicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
         myAlbumPicker.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+        myAlbumPicker.modalPresentationStyle = UIModalPresentationPageSheet;
         //Wird nur aufgerufen nachdem die Kamera schon gezeigt wurde
         UIBarButtonItem* button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(showCamera:)];
         myAlbumPicker.navigationItem.rightBarButtonItems = [NSArray arrayWithObject:button];
@@ -1360,6 +1361,7 @@
                  [imageView moveToLandscapeWithSize:size];
                  if (iPhone) {
                      [self.navigationController setNavigationBarHidden:YES animated:YES];
+                     [self moveToNewOrientation];
                  }
              }
          }
@@ -1369,6 +1371,7 @@
                  [imageView moveToPortraitWithSize:size];
                  if (iPhone) {
                      [self.navigationController setNavigationBarHidden:NO animated:YES];
+                     [self moveToNewOrientation];
                  }
              }
          }

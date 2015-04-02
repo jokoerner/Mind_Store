@@ -46,7 +46,7 @@
         NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
         // Edit the entity name as appropriate.
         NSEntityDescription *entity = [NSEntityDescription entityForName:@"NoteContainer" inManagedObjectContext:self.managedObjectContext];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self.title LIKE %@", @" Watch"];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self.title LIKE %@", @"Apple Watch"];
         [fetchRequest setPredicate:predicate];
         [fetchRequest setEntity:entity];
         NSArray *results = [self.managedObjectContext executeFetchRequest:fetchRequest error:nil];
@@ -54,7 +54,7 @@
         if (results.count == 0) {
             //erstellen
             watchContainer = [self newNoteContainer];
-            [watchContainer setTitle:@" Watch"];
+            [watchContainer setTitle:@"Apple Watch"];
         }
         else {
             watchContainer = [results lastObject];
@@ -150,7 +150,7 @@
         NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
         // Edit the entity name as appropriate.
         NSEntityDescription *entity = [NSEntityDescription entityForName:@"NoteContainer" inManagedObjectContext:self.managedObjectContext];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self.title LIKE %@", @" Watch"];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"self.title LIKE %@", @"Apple Watch"];
         [fetchRequest setPredicate:predicate];
         [fetchRequest setEntity:entity];
         NSArray *results = [self.managedObjectContext executeFetchRequest:fetchRequest error:nil];
@@ -158,7 +158,7 @@
         if (results.count == 0) {
             //erstellen
             watchContainer = [self newNoteContainer];
-            [watchContainer setTitle:@" Watch"];
+            [watchContainer setTitle:@"Apple Watch"];
         }
         else {
             watchContainer = [results lastObject];
@@ -201,7 +201,7 @@
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     // Edit the entity name as appropriate.
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Note" inManagedObjectContext:self.managedObjectContext];
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"noteContainer.title LIKE %@", @" Watch"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"noteContainer.title LIKE %@", @"Apple Watch"];
     [fetchRequest setPredicate:predicate];
     [fetchRequest setEntity:entity];
     NSArray *results = [self.managedObjectContext executeFetchRequest:fetchRequest error:nil];

@@ -162,6 +162,11 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    [self showBarButtonItems];
+}
+
 - (void)updateUserInterface {
     [self.tableView reloadData];
 }
@@ -528,6 +533,7 @@
 
 - (void)controllerWillChangeContent:(NSFetchedResultsController *)controller
 {
+    preUpdateSelectedIndexPath = self.tableView.indexPathForSelectedRow;
     [self.tableView beginUpdates];
 }
 
@@ -582,6 +588,10 @@
         [self.tableView selectRowAtIndexPath:tempIndexPath animated:YES scrollPosition:UITableViewScrollPositionMiddle];
         [self performSegueWithIdentifier:@"showDetail" sender:self];
         tempIndexPath = nil;
+    }
+    else if (preUpdateSelectedIndexPath) {
+        [self.tableView selectRowAtIndexPath:preUpdateSelectedIndexPath animated:YES scrollPosition:UITableViewScrollPositionNone];
+        preUpdateSelectedIndexPath = nil;
     }
 }
 
