@@ -217,6 +217,7 @@
     myTextField = [[UITextField alloc] initWithFrame:CGRectMake(5, -50, self.view.frame.size.width-80, 60)];
     [myTextField setTextColor:[UIColor whiteColor]];
     [myTextField setFont:customTableFontOfSize(30)];
+    [myTextField setAutocapitalizationType:UITextAutocapitalizationTypeWords];
     myTextField.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.15];
     [myTextField.layer setMasksToBounds:YES];
     [myTextField.layer setCornerRadius:5];

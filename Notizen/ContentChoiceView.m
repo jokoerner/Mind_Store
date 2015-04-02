@@ -216,7 +216,7 @@
         locationButton = nil;
         
         [dimView setBackgroundColor:[UIColor redColor]];
-        
+
         [self startRecording];
     }];
 }
@@ -229,7 +229,6 @@
 
 
 - (void) startRecording{
-    
     AVAudioSession *audioSession = [AVAudioSession sharedInstance];
     
     NSError *err = nil;

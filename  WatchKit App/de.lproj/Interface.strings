@@ -9,7 +9,7 @@
 "i1N-zu-KeI.text" = "Sorry, du musst zuerst Ortungsdienste für diese App freigeben.";
 
 /* Class = "WKInterfaceLabel"; text = "0"; ObjectID = "iZS-UC-wu1"; */
-"iZS-UC-wu1.text" = "0";
+"iZS-UC-wu1.text" = "3";
 
 /* Class = "WKInterfaceButton"; title = "Near Locations"; ObjectID = "yXQ-Wc-9Ay"; */
 "yXQ-Wc-9Ay.title" = "In der Nähe";

@@ -121,6 +121,7 @@
     removeObserverForName(self, @"accessoryButtonAction");
     
     if (iPad && textView) removeObserver(textView);
+    if (iPad && contentChoice) [contentChoice cancel];
     
     [[StoreHandler shared] stopAudio];
 }
@@ -264,7 +265,7 @@
 }
 
 - (void)dismissContentChoice {
-    [contentChoice dismiss];
+    [contentChoice cancel];
     [self contentChoiceCleanup];
 }
 

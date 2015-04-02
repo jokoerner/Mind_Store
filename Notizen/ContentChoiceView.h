@@ -33,7 +33,7 @@
 - (id)initWithFrame:(CGRect)frame;
 
 - (void)showInView:(UIView *)theView;
-- (void)dismiss;
+- (void)cancel;
 - (void)updateSize:(CGSize)newSize;
 
 @end

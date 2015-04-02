@@ -27,7 +27,7 @@
                             <variation key="device=watch38mm" height="70"/>
                             <variation key="device=watch42mm" height="80"/>
                         </group>
-                        <button width="1" height="0.5" alignment="center" verticalAlignment="bottom" title="Near Locations" id="yXQ-Wc-9Ay">
+                        <button width="1" height="0.5" alignment="center" verticalAlignment="bottom" title="Places Nearby" id="yXQ-Wc-9Ay">
                             <fontDescription key="font" type="system" pointSize="18"/>
                             <connections>
                                 <segue destination="a1e-rM-dDi" kind="push" id="GL8-RL-6lZ"/>
@@ -90,7 +90,7 @@
                         <label alignment="left" id="3UY-fu-8Nd"/>
                         <group alignment="left" id="eew-Gs-W6Y">
                             <items>
-                                <label width="1" height="1" alignment="left" text="0" textAlignment="center" id="iZS-UC-wu1">
+                                <label width="1" height="1" alignment="left" text="3" textAlignment="center" id="iZS-UC-wu1">
                                     <color key="textColor" red="0.28864251289999998" green="1" blue="0.3621111937" alpha="1" colorSpace="calibratedRGB"/>
                                     <fontDescription key="font" type="system" weight="ultraLight" pointSize="100"/>
                                 </label>

@@ -942,11 +942,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Notizen/ContainerViewController.m"
-            timestampString = "449672678.550771"
+            timestampString = "449675838.262418"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "1412"
-            endingLineNumber = "1412"
+            startingLineNumber = "1414"
+            endingLineNumber = "1414"
             landmarkName = "-shouldAutorotate"
             landmarkType = "5">
          </BreakpointContent>

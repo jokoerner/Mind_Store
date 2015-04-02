@@ -145,6 +145,7 @@
 		E495F54D1ABC699F000FC17E /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
 		E495F54E1ABC6A2B000FC17E /* BVReorderTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BVReorderTableView.h; sourceTree = "<group>"; };
 		E495F54F1ABC6A2B000FC17E /* BVReorderTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BVReorderTableView.m; sourceTree = "<group>"; };
+		E4A74B5A1ACDABBD007B02B7 /* Samba WIP.m4a */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Samba WIP.m4a"; sourceTree = "<group>"; };
 		E4BD6F1F1AA62A9E00B2356E /* Notizen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Notizen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4BD6F241AA62A9E00B2356E /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E4BD6F261AA62A9E00B2356E /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -313,6 +314,7 @@
 			isa = PBXGroup;
 			children = (
 				E4BD6F4E1AA62C9F00B2356E /* Notizen.entitlements */,
+				E4A74B5A1ACDABBD007B02B7 /* Samba WIP.m4a */,
 				E4589C5C1AB72E33002064B6 /* Localizable.strings */,
 				E4589C6B1AB73BC8002064B6 /* Settings.bundle */,
 				E4BD6F261AA62A9E00B2356E /* AppDelegate.h */,
