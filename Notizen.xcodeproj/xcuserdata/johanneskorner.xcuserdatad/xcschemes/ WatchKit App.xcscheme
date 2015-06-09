@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E45E9A801AB9B0D400F43F9D"
-               BuildableName = " WatchKit App.app"
-               BlueprintName = " WatchKit App"
+               BuildableName = "WatchKit App.app"
+               BlueprintName = "WatchKit App"
                ReferencedContainer = "container:Notizen.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -43,8 +43,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E45E9A721AB9B0D400F43F9D"
-               BuildableName = " WatchKit Extension.appex"
-               BlueprintName = " WatchKit Extension"
+               BuildableName = "WatchKit Extension.appex"
+               BlueprintName = "WatchKit Extension"
                ReferencedContainer = "container:Notizen.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -61,8 +61,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E45E9A801AB9B0D400F43F9D"
-            BuildableName = " WatchKit App.app"
-            BlueprintName = " WatchKit App"
+            BuildableName = "WatchKit App.app"
+            BlueprintName = "WatchKit App"
             ReferencedContainer = "container:Notizen.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -83,8 +83,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E45E9A801AB9B0D400F43F9D"
-            BuildableName = " WatchKit App.app"
-            BlueprintName = " WatchKit App"
+            BuildableName = "WatchKit App.app"
+            BlueprintName = "WatchKit App"
             ReferencedContainer = "container:Notizen.xcodeproj">
          </BuildableReference>
       </RemoteRunnable>
@@ -92,8 +92,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E45E9A801AB9B0D400F43F9D"
-            BuildableName = " WatchKit App.app"
-            BlueprintName = " WatchKit App"
+            BuildableName = "WatchKit App.app"
+            BlueprintName = "WatchKit App"
             ReferencedContainer = "container:Notizen.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -117,8 +117,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E45E9A801AB9B0D400F43F9D"
-            BuildableName = " WatchKit App.app"
-            BlueprintName = " WatchKit App"
+            BuildableName = "WatchKit App.app"
+            BlueprintName = "WatchKit App"
             ReferencedContainer = "container:Notizen.xcodeproj">
          </BuildableReference>
       </RemoteRunnable>
@@ -126,8 +126,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E45E9A801AB9B0D400F43F9D"
-            BuildableName = " WatchKit App.app"
-            BlueprintName = " WatchKit App"
+            BuildableName = "WatchKit App.app"
+            BlueprintName = "WatchKit App"
             ReferencedContainer = "container:Notizen.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

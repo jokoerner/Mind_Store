@@ -50,6 +50,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     UIImageView *background = [self.view.subviews objectAtIndex:0];
     [background setFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     [background setContentMode:UIViewContentModeScaleAspectFill];

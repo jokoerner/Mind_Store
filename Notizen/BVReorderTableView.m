@@ -157,14 +157,16 @@
         }
         
         [self beginUpdates];
-        [self deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
-        [self insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
-        
-        if ([self.delegate respondsToSelector:@selector(saveObjectAndInsertBlankRowAtIndexPath:)]) {
-            self.savedObject = [self.delegate saveObjectAndInsertBlankRowAtIndexPath:indexPath];
-        }
-        else {
-            NSLog(@"saveObjectAndInsertBlankRowAtIndexPath: is not implemented");
+        if (indexPath) {
+            [self deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
+            [self insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationNone];
+            
+            if ([self.delegate respondsToSelector:@selector(saveObjectAndInsertBlankRowAtIndexPath:)]) {
+                self.savedObject = [self.delegate saveObjectAndInsertBlankRowAtIndexPath:indexPath];
+            }
+            else {
+                NSLog(@"saveObjectAndInsertBlankRowAtIndexPath: is not implemented");
+            }
         }
         
         self.currentLocationIndexPath = indexPath;

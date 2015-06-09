@@ -193,8 +193,8 @@
 
 - (void)insertNewObject:(UIBarButtonItem *)item {
     if (!contentChoice) {
-        CGFloat width;
-        CGFloat heigth;
+        CGFloat width = 0;
+        CGFloat heigth = 0;
         if (iPhone) {
             width = self.navigationController.view.superview.frame.size.width;
             heigth = self.navigationController.view.superview.frame.size.height;
@@ -1178,8 +1178,8 @@
     //Content-Objekte und Note-Objekte sammeln
     for (NSIndexPath *indexPath in selected) {
         NoteContent *aContentObject = [self.fetchedResultsController objectAtIndexPath:indexPath];
-        [collectedObjects addObject:aContentObject];
-        if (![notesToKeep containsObject:aContentObject.note]) [notesToKeep addObject:aContentObject.note];
+        if (aContentObject) [collectedObjects addObject:aContentObject];
+        if (![notesToKeep containsObject:aContentObject.note] && aContentObject.note) [notesToKeep addObject:aContentObject.note];
     }
     
     //Content-Objekte löschen, Note-Objekte sammeln
@@ -1208,7 +1208,7 @@
     //Content-Objekte sammeln
     for (NSIndexPath *indexPath in selected) {
         NoteContent *aContentObject = [self.fetchedResultsController objectAtIndexPath:indexPath];
-        [collectedObjects addObject:aContentObject];
+        if (aContentObject) [collectedObjects addObject:aContentObject];
     }
     
     NSMutableArray *idObjects = [NSMutableArray array];
@@ -1271,7 +1271,7 @@
     
     for (NSIndexPath *indexPath in noteContentIndexPaths) {
         NoteContent *noteContent = (NoteContent *)[self.fetchedResultsController objectAtIndexPath:indexPath];
-        [noteContents addObject:noteContent];
+        if (noteContent) [noteContents addObject:noteContent];
     }
     
     MoveViewController *vc = [[MoveViewController alloc] initWithStyle:UITableViewStylePlain];
@@ -1292,7 +1292,7 @@
     for (NSIndexPath *indexPath in noteContentIndexPaths) {
         Note *note = [(NoteContent *)[self.fetchedResultsController objectAtIndexPath:indexPath] note];
         if (![notes containsObject:note]) {
-            [notes addObject:note];
+            if (note) [notes addObject:note];
         }
     }
     

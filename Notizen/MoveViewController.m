@@ -40,7 +40,7 @@
 - (void)handleAppearance {
     setBackgroundForView(self.navigationController.view);
     UIImageView *background = [self.navigationController.view.subviews objectAtIndex:0];
-    [background setFrame:CGRectMake(0, 0, self.navigationController.view.frame.size.width, self.navigationController.view.frame.size.height-64)];
+    [background setFrame:CGRectMake(0, 0, self.navigationController.view.frame.size.width, self.navigationController.view.frame.size.height)];
     [background setContentMode:UIViewContentModeScaleAspectFill];
     [self.view setBackgroundColor:[UIColor clearColor]];
     [self.tableView setBackgroundColor:[UIColor clearColor]];
@@ -287,7 +287,7 @@
 
 - (void)moveToNewOrientation {
     UIImageView *background = [self.navigationController.view.subviews objectAtIndex:0];
-    [background setFrame:CGRectMake(0, 0, self.navigationController.view.frame.size.width, self.navigationController.view.frame.size.height-64)];
+    [background setFrame:CGRectMake(0, 0, self.navigationController.view.frame.size.width, self.navigationController.view.frame.size.height)];
     [background setContentMode:UIViewContentModeScaleAspectFill];
     
 }
