@@ -25,9 +25,9 @@
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
     if ([keyPath isEqualToString:keyPath]) {
-        NSString *oldValue = [change objectForKey:NSKeyValueChangeOldKey];
+        //NSString *oldValue = [change objectForKey:NSKeyValueChangeOldKey];
         NSString *newValue = [change objectForKey:NSKeyValueChangeNewKey];
-        if (!self.deleted && ![newValue isKindOfClass:[NSNull class]] && ![newValue isEqualToString:oldValue]) {
+        if (!self.deleted && ![newValue isKindOfClass:[NSNull class]]) {
             self.firstLetter = [newValue substringToIndex:1];
         }
     }
