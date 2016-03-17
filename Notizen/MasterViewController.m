@@ -265,7 +265,7 @@
 }
 
 - (void)accepted {
-    if (myTextField.text.length > 0) {
+    if (myTextField.text && myTextField.text.length > 0) {
         [self insertNewObjectWithTitle:myTextField.text];
     }
     else {
@@ -438,6 +438,7 @@
 }
 
 - (void)configureCell:(UITableViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
+    
     NSManagedObject *object = [self.fetchedResultsController objectAtIndexPath:indexPath];
     cell.textLabel.text = [object valueForKey:@"title"];
     [self handleCellAppearance:cell];
@@ -508,6 +509,16 @@
     
     // Set the batch size to a suitable number.
     [fetchRequest setFetchBatchSize:20];
+    
+    // set properties to fetch
+    // to solve the problem, set properties to fetch, also set result type to dictionary
+    // also change the rest of the stuff to fit -.-
+    
+    [fetchRequest setIncludesSubentities: NO];
+    [fetchRequest setIncludesPropertyValues: NO]; // you need YES, which is the default
+    //[fetchRequest setResultType: NSDictionaryResultType];
+    //    [fetchRequest setPropertiesToFetch: @[ @"title", @"firstLetter"]];
+    //y[fetchRequest setReturnsObjectsAsFaults: NO];
     
     // Edit the sort key as appropriate.
     NSSortDescriptor *sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"title" ascending:[getDefault(@"ascending") boolValue]];
