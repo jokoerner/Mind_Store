@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		E4086E6F1AA8A0D70049A1F5 /* ModalTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = E4086E6E1AA8A0D70049A1F5 /* ModalTextView.m */; };
+		E41AD2911B2712B6000547A3 /* ActionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E41AD2901B2712B6000547A3 /* ActionViewController.m */; };
+		E41AD2931B2712B6000547A3 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E41AD2921B2712B6000547A3 /* MainInterface.storyboard */; };
+		E41AD2961B2712B6000547A3 /* ActionExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E41AD28B1B2712B6000547A3 /* ActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E424DFE21AB0A287000636F2 /* ContentChoiceView.m in Sources */ = {isa = PBXBuildFile; fileRef = E424DFE11AB0A287000636F2 /* ContentChoiceView.m */; };
 		E43B0DFB1AA9E3B10050EC8B /* RotationController.m in Sources */ = {isa = PBXBuildFile; fileRef = E43B0DFA1AA9E3B10050EC8B /* RotationController.m */; };
 		E43B0E041AA9E6900050EC8B /* RotationSplitViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E43B0E031AA9E6900050EC8B /* RotationSplitViewController.m */; };
@@ -59,6 +62,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		E41AD2941B2712B6000547A3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4BD6F171AA62A9E00B2356E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E41AD28A1B2712B6000547A3;
+			remoteInfo = ActionExtension;
+		};
 		E45E9A831AB9B0D400F43F9D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E4BD6F171AA62A9E00B2356E /* Project object */;
@@ -89,6 +99,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				E41AD2961B2712B6000547A3 /* ActionExtension.appex in Embed App Extensions */,
 				E45E9A8F1AB9B0D400F43F9D /* WatchKit Extension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
@@ -99,6 +110,11 @@
 /* Begin PBXFileReference section */
 		E4086E6D1AA8A0D70049A1F5 /* ModalTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalTextView.h; sourceTree = "<group>"; };
 		E4086E6E1AA8A0D70049A1F5 /* ModalTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ModalTextView.m; sourceTree = "<group>"; };
+		E41AD28B1B2712B6000547A3 /* ActionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ActionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		E41AD28E1B2712B6000547A3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E41AD28F1B2712B6000547A3 /* ActionViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ActionViewController.h; sourceTree = "<group>"; };
+		E41AD2901B2712B6000547A3 /* ActionViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ActionViewController.m; sourceTree = "<group>"; };
+		E41AD2921B2712B6000547A3 /* MainInterface.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainInterface.storyboard; sourceTree = "<group>"; };
 		E424DFE01AB0A287000636F2 /* ContentChoiceView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContentChoiceView.h; sourceTree = "<group>"; };
 		E424DFE11AB0A287000636F2 /* ContentChoiceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContentChoiceView.m; sourceTree = "<group>"; };
 		E43B0DF91AA9E3B10050EC8B /* RotationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RotationController.h; sourceTree = "<group>"; };
@@ -187,6 +203,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		E41AD2881B2712B6000547A3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E45E9A701AB9B0D400F43F9D /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -216,6 +239,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E41AD28C1B2712B6000547A3 /* ActionExtension */ = {
+			isa = PBXGroup;
+			children = (
+				E41AD28F1B2712B6000547A3 /* ActionViewController.h */,
+				E41AD2901B2712B6000547A3 /* ActionViewController.m */,
+				E41AD2921B2712B6000547A3 /* MainInterface.storyboard */,
+				E41AD28D1B2712B6000547A3 /* Supporting Files */,
+			);
+			path = ActionExtension;
+			sourceTree = "<group>";
+		};
+		E41AD28D1B2712B6000547A3 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				E41AD28E1B2712B6000547A3 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		E43B0E051AA9E7940050EC8B /* Rotation Controllers */ = {
 			isa = PBXGroup;
 			children = (
@@ -298,6 +340,7 @@
 				E4BD6F411AA62A9E00B2356E /* NotizenTests */,
 				E45E9A741AB9B0D400F43F9D /* WatchKit Extension */,
 				E45E9A851AB9B0D400F43F9D /* WatchKit App */,
+				E41AD28C1B2712B6000547A3 /* ActionExtension */,
 				E4BD6F201AA62A9E00B2356E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -309,6 +352,7 @@
 				E4BD6F3E1AA62A9E00B2356E /* NotizenTests.xctest */,
 				E45E9A731AB9B0D400F43F9D /* WatchKit Extension.appex */,
 				E45E9A811AB9B0D400F43F9D /* WatchKit App.app */,
+				E41AD28B1B2712B6000547A3 /* ActionExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -414,6 +458,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		E41AD28A1B2712B6000547A3 /* ActionExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E41AD2991B2712B7000547A3 /* Build configuration list for PBXNativeTarget "ActionExtension" */;
+			buildPhases = (
+				E41AD2871B2712B6000547A3 /* Sources */,
+				E41AD2881B2712B6000547A3 /* Frameworks */,
+				E41AD2891B2712B6000547A3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ActionExtension;
+			productName = ActionExtension;
+			productReference = E41AD28B1B2712B6000547A3 /* ActionExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		E45E9A721AB9B0D400F43F9D /* WatchKit Extension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E45E9A951AB9B0D400F43F9D /* Build configuration list for PBXNativeTarget "WatchKit Extension" */;
@@ -460,6 +521,7 @@
 			);
 			dependencies = (
 				E45E9A8E1AB9B0D400F43F9D /* PBXTargetDependency */,
+				E41AD2951B2712B6000547A3 /* PBXTargetDependency */,
 			);
 			name = Notizen;
 			productName = Notizen;
@@ -493,6 +555,10 @@
 				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "Johannes Körner";
 				TargetAttributes = {
+					E41AD28A1B2712B6000547A3 = {
+						CreatedOnToolsVersion = 6.3.2;
+						DevelopmentTeam = H3SQ7HSUW5;
+					};
 					E45E9A721AB9B0D400F43F9D = {
 						CreatedOnToolsVersion = 6.2;
 						DevelopmentTeam = H3SQ7HSUW5;
@@ -505,6 +571,9 @@
 						CreatedOnToolsVersion = 6.1.1;
 						DevelopmentTeam = H3SQ7HSUW5;
 						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
 							com.apple.BackgroundModes = {
 								enabled = 1;
 							};
@@ -537,11 +606,20 @@
 				E4BD6F3D1AA62A9E00B2356E /* NotizenTests */,
 				E45E9A721AB9B0D400F43F9D /* WatchKit Extension */,
 				E45E9A801AB9B0D400F43F9D /* WatchKit App */,
+				E41AD28A1B2712B6000547A3 /* ActionExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		E41AD2891B2712B6000547A3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E41AD2931B2712B6000547A3 /* MainInterface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E45E9A711AB9B0D400F43F9D /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -585,6 +663,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		E41AD2871B2712B6000547A3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E41AD2911B2712B6000547A3 /* ActionViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E45E9A6F1AB9B0D400F43F9D /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -640,6 +726,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		E41AD2951B2712B6000547A3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E41AD28A1B2712B6000547A3 /* ActionExtension */;
+			targetProxy = E41AD2941B2712B6000547A3 /* PBXContainerItemProxy */;
+		};
 		E45E9A841AB9B0D400F43F9D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E45E9A801AB9B0D400F43F9D /* WatchKit App */;
@@ -705,6 +796,41 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		E41AD2971B2712B7000547A3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = ActionExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		E41AD2981B2712B7000547A3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_NO_COMMON_BLOCKS = YES;
+				INFOPLIST_FILE = ActionExtension/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 		E45E9A901AB9B0D400F43F9D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -916,6 +1042,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		E41AD2991B2712B7000547A3 /* Build configuration list for PBXNativeTarget "ActionExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E41AD2971B2712B7000547A3 /* Debug */,
+				E41AD2981B2712B7000547A3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		E45E9A941AB9B0D400F43F9D /* Build configuration list for PBXNativeTarget "WatchKit App" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
