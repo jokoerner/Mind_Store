@@ -1,4 +1,4 @@
-# Mind_Store
+# Mind Store
 
 Mind Store transforms your iPhone or iPad into your second mind. We reinterpreted the notebook. The result is not just an app to take notes, it is a companion for your everyday life that allows you to store entire thoughts.
 
